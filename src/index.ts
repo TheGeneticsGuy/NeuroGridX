@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db';
+import { setupSwagger } from './config/swagger';
 
 dotenv.config();
 
@@ -13,6 +14,9 @@ const PORT = process.env.PORT || 5001;  // Local will be 5001
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Swagger
+setupSwagger(app);
 
 // TEST ROUTE
 app.get('/api', (req: Request, res: Response) => {
