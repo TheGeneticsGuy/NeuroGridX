@@ -1,0 +1,77 @@
+import express from 'express';
+import { registerUser, loginUser } from '../controllers/user.controller';
+
+const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User authentication and management
+ */
+
+/**
+ * @swagger
+ * /api/users/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 minLength: 6
+ *               role:
+ *                 type: string
+ *                 enum: [Standard, BCI]
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: User already exists or invalid data
+ */
+router.post('/register', registerUser);
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: Authenticate a user and get a token
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *     responses:
+ *       200:
+ *         description: Login successful, token returned
+ *       401:
+ *         description: Invalid email or password
+ */
+router.post('/login', loginUser);
+
+export default router;

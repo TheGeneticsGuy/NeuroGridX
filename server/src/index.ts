@@ -4,6 +4,9 @@ import cors from 'cors';
 import connectDB from './config/db';
 import { setupSwagger } from './config/swagger';
 
+// Route Imports
+import userRoutes from './routes/user.routes';
+
 dotenv.config();
 
 connectDB(); // Connect to MongoDB
@@ -18,7 +21,9 @@ app.use(express.json());
 // Swagger
 setupSwagger(app);
 
-// TEST ROUTE
+// Routes
+app.use('/api/users', userRoutes);
+// Test route
 app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the NeuroGrid API!' });
 });
