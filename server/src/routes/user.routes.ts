@@ -15,6 +15,7 @@ const router = express.Router();
  * /api/users/register:
  *   post:
  *     summary: Register a new user
+ *     description: Creates a new user account with a default role of 'Standard'.
  *     tags: [Users]
  *     requestBody:
  *       required: true
@@ -33,12 +34,10 @@ const router = express.Router();
  *                 type: string
  *                 format: password
  *                 minLength: 6
- *               role:
- *                 type: string
- *                 enum: [Standard, BCI]
+ *             # We have removed the 'role' property from this schema
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: User registered successfully with 'Standard' role.
  *       400:
  *         description: User already exists or invalid data
  */
