@@ -15,6 +15,16 @@ connectDB(); // Connect to MongoDB
 configurePassport(); // For Oauth login for Google
 
 const app: Express = express();
+const allowedOrigins = [
+  'http://localhost:5173', // Local frontend
+  // Render Deployment
+];
+
+const options: cors.CorsOptions = {
+  origin: allowedOrigins
+};
+app.use(cors(options));
+
 const PORT = process.env.PORT || 5001;  // Local will be 5001
 
 // Middlewares

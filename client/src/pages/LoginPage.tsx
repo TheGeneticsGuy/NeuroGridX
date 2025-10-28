@@ -2,7 +2,7 @@ import React from 'react';
 
 const LoginPage: React.FC = () => {
   // The backend URL for the Google OAuth flow
-  const googleAuthUrl = 'http://localhost:5001/api/auth/google'; // Eventually set to env
+  const googleAuthUrl = `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`;; // Eventually set to env
 
   return (
     <div>
