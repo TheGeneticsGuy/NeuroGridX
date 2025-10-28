@@ -49,8 +49,8 @@ router.get(
     const token = generateToken((user._id as Types.ObjectId).toString(), user.role);
 
     // Redirect to your frontend application, passing the token
-    // TODO: Move the frontend URL to a .env variable once I have frontend setup
-    res.redirect(`http://localhost:5173?token=${token}`); // PLACEHOLDER FOR NOW TIL I BUILD FRONTEND
+    const clientURL = process.env.CLIENT_URL;
+    res.redirect(`${clientURL}?token=${token}`)
   }
 );
 
