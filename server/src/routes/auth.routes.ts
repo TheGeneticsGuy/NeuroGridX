@@ -50,7 +50,7 @@ router.get(
 
     // Redirect to your frontend application, passing the token
     // TODO: Move the frontend URL to a .env variable once I have frontend setup
-    res.redirect(`http://localhost:3000?token=${token}`); // PLACEHOLDER FOR NOW TIL I BUILD FRONTEND
+    res.redirect(`http://localhost:5173?token=${token}`); // PLACEHOLDER FOR NOW TIL I BUILD FRONTEND
   }
 );
 
