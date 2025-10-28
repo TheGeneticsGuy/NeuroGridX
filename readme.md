@@ -1,5 +1,8 @@
 # NeuroGrid: A Web-Based Platform for Human Computer Interaction Analysis
 
+[Backend Deployment](https://neurogrid-server.onrender.com/api)
+[Frontend Deployment](https://neurogrid-client.onrender.com)
+
 This repository contains the full-stack source code for the NeuroGrid project, a web-based platform for advanced human-computer interaction analysis, with a focus on Brain-Computer Interfaces (BCIs). It is structured as a monorepo with two primary packages:
 
 -   `/server`: The backend API built with Node.js, Express, and TypeScript.
