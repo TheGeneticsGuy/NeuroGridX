@@ -15,6 +15,8 @@ connectDB(); // Connect to MongoDB
 configurePassport(); // For Oauth login for Google
 
 const app: Express = express();
+app.set('trust proxy', 1);  // Necessary for my Oauth
+
 const allowedOrigins = [
   'http://localhost:5173', // Local frontend
   // Render Deployment
