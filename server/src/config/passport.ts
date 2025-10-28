@@ -11,7 +11,7 @@ const configurePassport = () => {
       {
         clientID: process.env.GOOGLE_CLIENT_ID as string,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-        callbackURL: '/api/auth/google/callback', // Setup in the Google cloud Developer Console
+        callbackURL: `${process.env.SERVER_BASE_URL}/api/auth/google/callback`, // Setup in the Google cloud Developer Console
         scope: ['profile', 'email'],
       },
       async (accessToken, refreshToken, profile, done) => {
