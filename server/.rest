@@ -1,0 +1,53 @@
+# REST Client for NeuroGrid API
+# Using ### to separate requests.
+
+@api_base = http://localhost:5001/api
+
+# Make testing email easier
+@email = testuser-1@example.com
+@password = password123
+
+###
+# @name registerUser
+# Register a new user
+# This endpoint should always create a user with the 'Standard' role.
+POST {{api_base}}/users/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+# @name loginUser
+# Log in as the user created above to get a JWT
+POST {{api_base}}/users/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
+
+###
+# @name loginWithInvalidCredentials
+# Testing a failed login attempt
+POST {{api_base}}/users/login
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "wrongpassword"
+}
+
+###
+# @name registerExistingUser
+# Test attempting to register a user that already exists
+POST {{api_base}}/users/register
+Content-Type: application/json
+
+{
+  "email": "{{email}}",
+  "password": "{{password}}"
+}
