@@ -10,7 +10,7 @@ const Header: React.FC = () => {
   // LogOut Logic - Easily manageable.
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -20,20 +20,23 @@ const Header: React.FC = () => {
           NeuroGrid
         </Link>
         <nav>
-          {isAuthenticated ? (
-            <div className="nav-links">
-              <Link to="/challenges">Challenges</Link>
-              <Link to="/dashboard">Dashboard</Link>
-              <span className="user-info">Logged in as: {user?.role}</span>     {/* TESTING */}
-              <button onClick={handleLogout} className="logout-button">
-                Logout
-              </button>
-            </div>
-          ) : (
-            <div className="nav-links">
-              <Link to="/login">Login</Link>
-            </div>
-          )}
+          <div className="nav-links">
+            <Link to="/challenges">Challenges</Link>
+
+            {isAuthenticated ? (
+              <> {/* Use a React Fragment */}
+                <Link to="/dashboard">Dashboard</Link>
+                <span className="user-info">Role: {user?.role}</span>   {/* TESTING ROLE - TODO: Remove*/}
+                <button onClick={handleLogout} className="logout-button">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <> {/* Use a React Fragment */}
+                <Link to="/login">Login</Link>
+              </>
+            )}
+          </div>
         </nav>
       </div>
     </header>

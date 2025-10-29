@@ -1,36 +1,32 @@
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import ChallengesPage from './pages/ChallengesPage';
 import AuthHandler from './components/auth/AuthHandler';
-import { useAuthStore } from './store/auth.store';
 import Layout from './components/layout/Layout';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-     <Router>
-      {/* AuthHandler will run on every route change to check for a token */}
+    <Router>
       <AuthHandler />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Layout>
-                <HomePage />
-              </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-        <Route
-          path="/login"
-          element={!isAuthenticated ? <LoginPage /> : <Navigate to="/" replace />}
-        />
-        {/*TODO: Add more routes to authenticated ujsers */}
-      </Routes>
+      <Layout>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/challenges" element={<ChallengesPage />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+
+          {/* Placeholder for future protected routes */}
+          </Route>
+        </Routes>
+      </Layout>
     </Router>
   );
 }
