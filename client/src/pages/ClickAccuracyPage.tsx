@@ -1,112 +1,57 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { useAuthStore } from '../store/auth.store';
+import { useGameStore } from '../store/game.store';
 import axios from 'axios';
 import './ClickAccuracyPage.css';
 
-// PENDING NOTES AND IDEAS:
-// RANDOM SIZE - Add option to make the sizes random and placement random, or a fixed event.
-//          The issue is due to randomness, someone could get an easier placement... not sure how I want to approach yet.
-//          THOUGHTS - Fixed amount of sizes, but placement is random, and order, is random, and maybe placement will always be equal distance away
-//          but round position on the circle.
-// PENALTYU - Determine better scoring mechanism... I initially minused 20 on a miss, but I am realizing that
-//              removing points is no fun. It should just reward total accomplished.
-// USEFFECT - THOUGHTS - Only save if your best score.
+const totalTime = 60; // Fixed countdown timer of 60 seconds
 
-
-// For determining the shape of a target
-interface Target {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-}
-
-// Enum for the different game states
-const GameState = {
-  NotStarted: 'NotStarted',
-  InProgress: 'InProgress',
-  Finished: 'Finished',
-} as const;
-
-type GameState = typeof GameState[keyof typeof GameState];
+// For the countdown
+const formatTime = (seconds: number) => {
+  const mins = Math.floor(seconds / totalTime).toString().padStart(2, '0');
+  const secs = (seconds % totalTime).toString().padStart(2, '0');
+  return `${mins}:${secs}`;
+};
 
 const ClickAccuracyPage: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>(GameState.NotStarted);
-  const [targets, setTargets] = useState<Target[]>([]);
-  const [score, setScore] = useState(0);
-  const [hits, setHits] = useState(0);
-  const [misses, setMisses] = useState(0);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [timeTaken, setTimeTaken] = useState(0);
+  // State and actions from our new game store
+  const {
+    gameState, score, hits, misses, timeRemaining, targets, clickAccuracies,
+    startGame, handleHit, handleMiss, resetGame
+  } = useGameStore();
 
-  // Get user info from Zustand store
+  // Auth info for saving the score
   const { isAuthenticated, token } = useAuthStore();
-  const TOTAL_TARGETS = 15;
 
-  // Method to generate random position of new target... THIS WILL BE TWEAKED A LOT
-  const generateTarget = useCallback(() => {
-    const size = Math.random() * 130 + 20; // Random size between 20 and 150px - SHOULD I DO RANDOM?
-    const newTarget: Target = {
-      id: Date.now(),
-      x: Math.random() * (window.innerWidth - size * 2) + size,
-      y: Math.random() * (window.innerHeight - size * 2 - 80) + size + 80, // This ensure header is avoided.
-      size: size,
+  // Cleans up game if component is unmounted, like a different part of site.
+  useEffect(() => {
+    return () => {
+      resetGame();
     };
-    setTargets([newTarget]);
-  }, []);
+  }, [resetGame]);
 
-  // Reset game data on start
-  const startGame = () => {
-    setScore(0);
-    setHits(0);
-    setMisses(0);
-    setTimeTaken(0);
-    setGameState(GameState.InProgress);
-    setStartTime(Date.now());
-    generateTarget();
-  };
-
-  const handleHit = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation(); // Prevents the click from registering on the game area (a miss)
-
-    if (gameState !== GameState.InProgress) return;
-
-    setScore(prev => prev + 100);
-    setHits(prev => prev + 1);
-
-    if (hits + 1 >= TOTAL_TARGETS) {
-      setGameState(GameState.Finished);
-      setStartTime(null);
-      if(startTime) {
-        setTimeTaken((Date.now() - startTime) / 1000);
-      }
-    } else {
-      generateTarget();
-    }
-  };
-
-  const handleMiss = () => {
-    if (gameState !== GameState.InProgress) return;
-    setMisses(prev => prev + 1);
-    setScore(prev => prev - 20); // Penalty for missing
-  };
-
-  // This useEffect hook runs when game finishes and result is saved.
+  // This effect handles saving the score when the game finishes
   useEffect(() => {
     const saveScore = async () => {
-      if (gameState === GameState.Finished && isAuthenticated && token) {
+      // Calculate final metrics
+      const ntpm = hits - misses;
+      const averageClickAccuracy = clickAccuracies.length > 0
+        ? clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length
+        : 0;
+
+      if (gameState === 'Finished' && isAuthenticated && token) {
         try {
           const finalScore = {
             challengeType: 'Click Accuracy',
             score: score,
-            completionTime: timeTaken,
-            accuracy: hits / (hits + misses),
+            completionTime: totalTime,
+            accuracy: hits > 0 ? hits / (hits + misses) : 0,
+            ntpm: ntpm,
+            averageClickAccuracy: averageClickAccuracy,
           };
 
           await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/challenges/attempts`, finalScore, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Score saved successfully!");
         } catch (error) {
@@ -115,50 +60,77 @@ const ClickAccuracyPage: React.FC = () => {
       }
     };
 
-    saveScore();
-  }, [gameState, isAuthenticated, token, score, timeTaken, hits, misses]);
+    if (gameState === 'Finished') {
+      saveScore();
+    }
+  }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies]);
+
+  // The main click handler for the game area (a miss)
+  const onGameAreaClick = () => {
+    handleMiss();
+  };
+
+  // Circle click handler
+  const onTargetClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation(); // Prevents the click from creeping up to the game area
+    handleHit(e.clientX, e.clientY, e.currentTarget);
+  };
+
+  // Calculate stats for end of game display
+  const ntpm = hits - misses;
+  const averageClickAccuracy = clickAccuracies.length > 0
+    ? (clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length * 100).toFixed(2)
+    : 'N/A';
 
   return (
-    <div className="game-container" onClick={handleMiss}>
-      {gameState === GameState.NotStarted && (
+    <div className="game-container" onClick={onGameAreaClick}>
+      {gameState === 'NotStarted' && (
         <div className="game-overlay">
           <h1>Click Accuracy Challenge</h1>
-          <p>Click {TOTAL_TARGETS} targets as quickly and accurately as possible.</p>
-          <button onClick={startGame} className="cta-button">Start Game</button>
+          <p>Click as many targets as you can in {totalTime} seconds.</p>
+          <p>Points are awarded based on how close you click to the center.</p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // I was having challenge where negative score was always at start due to first click
+              startGame();
+            }}
+            className="cta-button"
+          >
+            Start Game
+          </button>
         </div>
       )}
 
-      {gameState === GameState.InProgress && (
+      {gameState === 'InProgress' && (
         <div className="game-hud">
+          <div>Time: {formatTime(timeRemaining)}</div>
           <div>Score: {score}</div>
-          <div>Hits: {hits}/{TOTAL_TARGETS}</div>
-          <div>Misses: {misses}</div>
+          <div>NTPM: {ntpm}</div>
         </div>
       )}
 
-      {gameState === GameState.Finished && (
+      {gameState === 'Finished' && (
          <div className="game-overlay">
-          <h1>Challenge Complete!</h1>
+          <h1>Time's Up!</h1>
           <p>Final Score: {score}</p>
-          <p>Time Taken: {timeTaken.toFixed(2)} seconds</p>
-          <p>Accuracy: {((hits / (hits + misses)) * 100).toFixed(2)}%</p>
-          {isAuthenticated && <p>Your score has been saved to your dashboard.</p>}
-          {!isAuthenticated && <p>Login to save your scores and track your progress!</p>}
+          <p>Total Hits: {hits}</p>
+          <p>Total Misses: {misses}</p>
+          <p>Net Targets Per Minute (NTPM): {ntpm}</p>
+          <p>Average Click Accuracy to Center: {averageClickAccuracy}%</p>
+          {isAuthenticated ? <p>Your score has been saved.</p> : <p>Login to save your scores!</p>}
           <button onClick={startGame} className="cta-button">Play Again</button>
         </div>
       )}
 
-      {gameState === GameState.InProgress && targets.map(target => (
+      {gameState === 'InProgress' && targets.map(target => (
         <div
           key={target.id}
           className="target"
           style={{
-            left: `${target.x}px`,
-            top: `${target.y}px`,
-            width: `${target.size}px`,
-            height: `${target.size}px`,
+            left: `${target.x}px`, top: `${target.y}px`,
+            width: `${target.size}px`, height: `${target.size}px`,
           }}
-          onClick={handleHit}
+          onClick={onTargetClick}
         />
       ))}
     </div>

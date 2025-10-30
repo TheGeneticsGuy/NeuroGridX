@@ -5,7 +5,7 @@ import Attempt from '../models/attempt.model';
 // @route   POST /api/challenges/attempts
 // @access  Private
 export const createAttempt = async (req: AuthRequest, res: Response) => {
-  const { challengeType, score, completionTime, accuracy } = req.body;
+  const { challengeType, score, completionTime, accuracy, ntpm, averageClickAccuracy } = req.body;
   const userId = req.user._id;
 
   try {
@@ -15,6 +15,8 @@ export const createAttempt = async (req: AuthRequest, res: Response) => {
       score,
       completionTime,
       accuracy,
+      ntpm,
+      averageClickAccuracy,
     });
 
     res.status(201).json(attempt);
