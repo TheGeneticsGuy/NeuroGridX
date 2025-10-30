@@ -1,11 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const ChallengesPage: React.FC = () => {
   return (
     <div>
-      <h1>Challenges - PENDING</h1>
-      <p>I will Create Challenges to choose from, probably cards, maybe with GIF type aniimation of what the game looks like in the card!</p>
-      {/* Specific challenges like the Click Accuracy here */}
+      <h1>Challenges</h1>
+      <p>Select a challenge to play. Anyone can play!</p>
+      <div style={{ marginTop: '2rem' }}>
+        <Link to="/challenges/click-accuracy" className="cta-button">
+          Click Accuracy
+        </Link>
+      </div>
     </div>
   );
 };

@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import ChallengesPage from './pages/ChallengesPage';
+import ClickAccuracyPage from './pages/ClickAccuracyPage';
 import AuthHandler from './components/auth/AuthHandler';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/challenges" element={<ChallengesPage />} />
+          <Route path="/challenges/click-accuracy" element={<ClickAccuracyPage />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
