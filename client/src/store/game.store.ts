@@ -39,7 +39,7 @@ interface GameStateStore {
   handleMiss: () => void;
   resetGame: () => void;
    // Internal timer
-   _timerInterval: NodeJS.Timeout | null;
+   _timerInterval: number | null;
   _generateTarget: () => void;
 }
 
@@ -56,7 +56,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
   startGame: () => {
     // Clear before starting new.
     if (get()._timerInterval) {
-      clearInterval(get()._timerInterval as NodeJS.Timeout);
+      clearInterval(get()._timerInterval as number);
     }
 
     set({
@@ -136,7 +136,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
 
   resetGame: () => {
     if (get()._timerInterval) {
-      clearInterval(get()._timerInterval as NodeJS.Timeout);
+      clearInterval(get()._timerInterval as number);
     }
     set({
       gameState: GameState.NotStarted,
