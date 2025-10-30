@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.routes';
 
 // Route Imports
 import userRoutes from './routes/user.routes';
+import challengeRoutes from './routes/challenge.routes';
 
 dotenv.config();
 connectDB(); // Connect to MongoDB
@@ -40,6 +41,8 @@ setupSwagger(app);
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/challenges', challengeRoutes);
+
 // Test route
 app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the NeuroGrid API!' });
