@@ -8,6 +8,7 @@ import { create } from 'zustand';
 // Add horizontal and vertical lines with intersecting at the mouse cursor, with a % accuracy number over cursor on the click.
 
 const TOTAL_TIME = 60;
+const MAX_TARGET_SIZE = 120;
 
 // For some reason I couldn't get enum to work right...
 const GameState = {
@@ -152,7 +153,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
 
   // "Private" helper function
   _generateTarget: () => {
-    const size = Math.random() * 120 + 30;
+    const size = Math.random() * MAX_TARGET_SIZE + 30;
     const newTarget: Target = {
       id: Date.now(),
       x: Math.random() * (window.innerWidth - size * 2) + size,
