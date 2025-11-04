@@ -2,8 +2,11 @@ import React, { useState, useEffect, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
 import '../styles/forms.css';
+
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -78,13 +81,17 @@ const LoginPage: React.FC = () => {
       </form>
       <div className="form-divider"><span>OR</span></div>
       <div className="google-button-container">
-        <GoogleLogin
-          onSuccess={handleGoogleSuccess}
-          onError={() => {
-            console.log('Login Failed');
-            setError('Google login failed.');
-          }}
-        />
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <GoogleLogin
+            theme='filled_blue'
+            shape="pill"
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              console.log('Login Failed');
+              setError('Google login failed.');
+            }}
+          />
+        </GoogleOAuthProvider>
       </div>
       <p className="form-link">
         Don't have an account? <Link to="/register">Create an account</Link>

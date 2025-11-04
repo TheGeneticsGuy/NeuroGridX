@@ -6,11 +6,10 @@ import generateToken from '../utils/generateToken';
 // @route   POST /api/users/register
 // @access  Public
 export const registerUser = async (req: Request, res: Response) => {
-  // NOTE!!! The reason I am not adding a role to be selected here is I don't want anyone but admin to set user role.
-  const { email, password } = req.body;
+  const { email, password, firstName, lastName } = req.body;
 
   try {
-    const userExists = await User.findOne({ email }); // Ensure they aren't already registered
+    const userExists = await User.findOne({ email }); // No need to register if they already have!!
 
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
@@ -19,14 +18,16 @@ export const registerUser = async (req: Request, res: Response) => {
     const user = await User.create({
       email,
       password,
-      role: 'Standard', // Hardcoding role to 'Standard' for new registrations. Admin can change roles later.
+      firstName,
+      lastName,
+      role: 'Standard',
     });
 
     if (user) {
       res.status(201).json({
         _id: user._id,
         email: user.email,
-        role: user.role, // This will correctly return 'Standard'
+        role: user.role,
         token: generateToken((user._id as Types.ObjectId).toString(), user.role),
       });
     } else {
@@ -36,7 +37,6 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 // @route   POST /api/users/login
 // @access  Public

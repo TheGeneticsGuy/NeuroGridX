@@ -7,6 +7,7 @@ import ClickAccuracyPage from './pages/ClickAccuracyPage';
 import AuthHandler from './components/auth/AuthHandler';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import RegisterPage from './pages/RegisterPage';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/challenges" element={<ChallengesPage />} />
           <Route path="/challenges/click-accuracy" element={<ClickAccuracyPage />} />
 
