@@ -38,28 +38,24 @@ import bcrypt from 'bcryptjs';
 // Interface for the User document
 export interface IUser extends Document {
   email: string;
-  password?: string; // Password is optional as if I am using Google Oauth
-  googleId?: string; // For Google OAuth users
+  firstName?: string;
+  lastName?: string;
+  password?: string;
+  googleId?: string;
   role: 'Standard' | 'BCI' | 'Admin';
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
-const userSchema: Schema<IUser> = new Schema(
-  {
-    email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
-    password: { type: String, required: false }, // Not required for OAuth users
-    googleId: { type: String, required: false },
-    role: {
-      type: String,
-      required: true,
-      enum: ['Standard', 'BCI', 'Admin'],
-      default: 'Standard',
-    },
-  },
-  {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields thanks to Mongoose.
-  }
-);
+const userSchema: Schema<IUser> = new Schema({
+  email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  password: { type: String, required: false },
+  googleId: { type: String, required: false },
+  role: { type: String, required: true, enum: ['Standard', 'BCI', 'Admin'], default: 'Standard' },
+}, {
+  timestamps: true
+});
 
 // Compare entered password with the hashed (bcrypt) password
 userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {

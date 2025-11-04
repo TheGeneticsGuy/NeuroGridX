@@ -26,3 +26,8 @@ The backend provides a RESTful API for user authentication, challenge management
 ## Frontend (`/client`)
 
 The frontend is a modern, single-page application (SPA) built with React that provides the user interface for all interactive challenges, including user and admin dashboards.
+
+
+## MISC LIBRARIES USED
+
+-   [**React Oauth2 | Google**](https://www.npmjs.com/package/@react-oauth/google) - User Auth with Google with customizable frames.

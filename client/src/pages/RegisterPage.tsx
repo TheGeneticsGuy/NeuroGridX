@@ -8,9 +8,11 @@ import '../styles/forms.css';
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-const LoginPage: React.FC = () => {
+const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
@@ -18,43 +20,70 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/'); // If logged in, go to home page
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async (e: FormEvent) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/login`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/register`, {
         email,
         password,
+        firstName,
+        lastName,
       });
       setToken(response.data.token);
-      navigate('/'); // Navigate to home on successful login
+      navigate('/dashboard'); // Navigate to dashboard on successful registration
+
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Registration failed');
     }
   };
 
+  // Google OAuth success
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google-token`, {
         token: credentialResponse.credential,
       });
       setToken(res.data.token);
-      navigate('/'); // Navigate to home on successful login
+      navigate('/dashboard'); // Navigate to dashboard on successful registration
     } catch (err) {
-      console.error('Google login failed', err);
-      setError('Google login failed.');
+      console.error('Google registration failed', err);
+      setError('Google registration failed.');
     }
   };
 
   return (
     <div className="form-container">
-      <h1>Sign In</h1>
+      <h1>Create an Account</h1>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleRegister}>
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            className="form-input"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            className="form-input"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
@@ -75,29 +104,30 @@ const LoginPage: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={6}
           />
         </div>
-        <button type="submit" className="form-button">Sign In</button>
+        <button type="submit" className="form-button">Create Account</button>
       </form>
       <div className="form-divider"><span>OR</span></div>
       <div className="google-button-container">
         <GoogleOAuthProvider clientId={googleClientId}>
-          <GoogleLogin
+            <GoogleLogin
             theme='filled_blue'
             shape="pill"
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              console.log('Login Failed');
-              setError('Google login failed.');
+                console.log('Login Failed');
+                setError('Google login failed.');
             }}
-          />
+            />
         </GoogleOAuthProvider>
       </div>
       <p className="form-link">
-        Don't have an account? <Link to="/register">Create an account</Link>
+        Already have an account? <Link to="/login">Sign In</Link>
       </p>
     </div>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
