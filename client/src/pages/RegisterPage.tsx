@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import ValidationErrors from '../components/common/ValidationErrors';
+import PasswordStrength from '../components/auth/PasswordStrength';
+
 import axios from 'axios';
 import '../styles/forms.css';
 
@@ -13,7 +16,7 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([])
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
@@ -26,7 +29,7 @@ const RegisterPage: React.FC = () => {
 
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setErrors([]); // Clear all previous errorss
 
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/register`, {
@@ -39,7 +42,11 @@ const RegisterPage: React.FC = () => {
       navigate('/dashboard'); // Navigate to dashboard on successful registration
 
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed');
+      if (err.response?.data?.messages) {
+        setErrors(err.response.data.messages);
+      } else {
+        setErrors([err.response?.data?.message || 'Registration failed']);
+      }
     }
   };
 
@@ -53,14 +60,14 @@ const RegisterPage: React.FC = () => {
       navigate('/dashboard'); // Navigate to dashboard on successful registration
     } catch (err) {
       console.error('Google registration failed', err);
-      setError('Google registration failed.');
+      setErrors(['Google registration failed.']);
     }
   };
 
   return (
     <div className="form-container">
       <h1>Create an Account</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <ValidationErrors errors={errors} />
       <form onSubmit={handleRegister}>
         <div className="form-group">
           <label htmlFor="firstName">First Name</label>
@@ -106,6 +113,7 @@ const RegisterPage: React.FC = () => {
             required
             minLength={6}
           />
+          <PasswordStrength password={password} />
         </div>
         <button type="submit" className="form-button">Create Account</button>
       </form>
@@ -118,7 +126,7 @@ const RegisterPage: React.FC = () => {
             onSuccess={handleGoogleSuccess}
             onError={() => {
                 console.log('Login Failed');
-                setError('Google login failed.');
+                setErrors(['Google login failed.']);
             }}
             />
         </GoogleOAuthProvider>

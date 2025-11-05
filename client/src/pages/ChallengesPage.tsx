@@ -8,7 +8,7 @@ const ChallengesPage: React.FC = () => {
       <p>Select a challenge. Anyone can play!</p>
       <div style={{ marginTop: '2rem' }}>
         <Link to="/challenges/click-accuracy" className="cta-button">
-          Click Accuracy
+          Reaction Time
         </Link>
       </div>
     </div>
