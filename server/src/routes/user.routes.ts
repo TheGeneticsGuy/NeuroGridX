@@ -1,5 +1,6 @@
 import express from 'express';
 import { registerUser, loginUser } from '../controllers/user.controller';
+import { validateRegistration, validateLogin } from '../middleware/validation.middleware';
 
 const router = express.Router();
 
@@ -41,7 +42,7 @@ const router = express.Router();
  *       400:
  *         description: User already exists or invalid data
  */
-router.post('/register', registerUser);
+router.post('/register', validateRegistration, registerUser);
 
 /**
  * @swagger
@@ -71,6 +72,6 @@ router.post('/register', registerUser);
  *       401:
  *         description: Invalid email or password
  */
-router.post('/login', loginUser);
+router.post('/login', validateLogin, loginUser);
 
 export default router;

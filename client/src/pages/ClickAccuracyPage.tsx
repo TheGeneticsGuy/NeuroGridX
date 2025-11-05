@@ -42,7 +42,7 @@ const ClickAccuracyPage: React.FC = () => {
       if (gameState === 'Finished' && isAuthenticated && token) {
         try {
           const finalScore = {
-            challengeType: 'Click Accuracy',
+            challengeType: 'Reaction Time',
             score: score,
             completionTime: totalTime,
             accuracy: hits > 0 ? hits / (hits + misses) : 0,
@@ -86,7 +86,7 @@ const ClickAccuracyPage: React.FC = () => {
     <div className="game-container" onClick={onGameAreaClick}>
       {gameState === 'NotStarted' && (
         <div className="game-overlay">
-          <h1>Click Accuracy Challenge</h1>
+          <h1>Reaction Time Challenge</h1>
           <p>Click as many targets as you can in {totalTime} seconds.</p>
           <p>Points are awarded based on how close you click to the center.</p>
           <button

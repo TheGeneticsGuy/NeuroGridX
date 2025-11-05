@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth.store';
 import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import ValidationErrors from '../components/common/ValidationErrors';
+
 import axios from 'axios';
 import '../styles/forms.css';
 
@@ -11,7 +13,7 @@ const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([])
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
@@ -24,7 +26,7 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setErrors([]);
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/login`, {
         email,
@@ -33,7 +35,7 @@ const LoginPage: React.FC = () => {
       setToken(response.data.token);
       navigate('/'); // Navigate to home on successful login
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      setErrors([err.response?.data?.message || 'Login failed']);
     }
   };
 
@@ -46,14 +48,14 @@ const LoginPage: React.FC = () => {
       navigate('/'); // Navigate to home on successful login
     } catch (err) {
       console.error('Google login failed', err);
-      setError('Google login failed.');
+      setErrors(['Google login failed.']);
     }
   };
 
   return (
     <div className="form-container">
       <h1>Sign In</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <ValidationErrors errors={errors} />
       <form onSubmit={handleLogin}>
         <div className="form-group">
           <label htmlFor="email">Email</label>
@@ -88,7 +90,7 @@ const LoginPage: React.FC = () => {
             onSuccess={handleGoogleSuccess}
             onError={() => {
               console.log('Login Failed');
-              setError('Google login failed.');
+              setErrors(['Google login failed.']);
             }}
           />
         </GoogleOAuthProvider>
