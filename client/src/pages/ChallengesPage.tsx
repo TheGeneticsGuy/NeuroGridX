@@ -7,7 +7,7 @@ const ChallengesPage: React.FC = () => {
       <h1>Challenges</h1>
       <p>Select a challenge. Anyone can play!</p>
       <div style={{ marginTop: '2rem' }}>
-        <Link to="/challenges/click-accuracy" className="cta-button">
+        <Link to="/challenges/reaction-time" className="cta-button">
           Reaction Time
         </Link>
       </div>
