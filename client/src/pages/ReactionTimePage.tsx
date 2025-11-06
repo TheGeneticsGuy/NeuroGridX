@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
+import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTimeStatCard';
 import { useAuthStore } from '../store/auth.store';
 import { useGameStore } from '../store/game.store';
 import axios from 'axios';
-import './ClickAccuracyPage.css';
+import './ReactionTimePage.css';
 
 const totalTime = 60; // Fixed countdown timer of 60 seconds
 
@@ -13,7 +14,7 @@ const formatTime = (seconds: number) => {
   return `${mins}:${secs}`;
 };
 
-const ClickAccuracyPage: React.FC = () => {
+const ReactionTimePage: React.FC = () => {
   // State and actions from our new game store
   const {
     gameState, score, hits, misses, timeRemaining, targets, clickAccuracies,
@@ -137,4 +138,4 @@ const ClickAccuracyPage: React.FC = () => {
   );
 };
 
-export default ClickAccuracyPage;
+export default ReactionTimePage;
