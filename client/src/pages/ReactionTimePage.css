@@ -1,12 +1,57 @@
 .game-container {
   width: 100vw;
   height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: #242424;
+  /* position: fixed; */
+  width: 100%; /* Fill the width of the parent (.main-content) */
+  height: 100%;
+  background-color: var(--color-background); /* Use theme variable */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.game-canvas {
+  width: 90vw;
+  height: 90vh;
+  max-width: 1050px;
+  max-height: 700px;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
   cursor: crosshair;
   overflow: hidden;
+}
+
+.game-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem 0;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: var(--color-text-primary);
+  font-size: 1.2rem;
+}
+
+.target {
+  position: absolute;
+  background-color: #646cff;
+  border-radius: 50%;
+  border: 2px solid white;
+  transform: translate(-50%, -50%);
+  transition: all 0.1s ease-out;
+}
+
+.target:hover {
+  background-color: #8187ff;
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .game-overlay {
@@ -22,34 +67,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.game-hud {
-  position: absolute;
-  top: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2rem;
-  color: #fff;
-  font-size: 1.2rem;
-  background-color: #1a1a1a;
-  padding: 0.5rem 1.5rem;
-  border-radius: 8px;
-}
-
-.target {
-  position: absolute;
-  background-color: #646cff;
-  border-radius: 50%;
-  border: 2px solid white;
-  transform: translate(-50%, -50%);
-  transition: all 0.1s ease-out;
-}
-
-.target:hover {
-  background-color: #8187ff;
-  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .stat-card-inline {

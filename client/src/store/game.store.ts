@@ -7,8 +7,9 @@ import { create } from 'zustand';
 // ADD An Advanced challenge mode where the object is moving around... and you can set it to 4 differnt speeds. Normal Med Fast Ultra Fast
 // Add horizontal and vertical lines with intersecting at the mouse cursor, with a % accuracy number over cursor on the click.
 
-const TOTAL_TIME = 60;
-const MAX_TARGET_SIZE = 120;
+const TOTAL_TIME = 60;        // Length of the challenge
+const MAX_TARGET_SIZE = 120;  // Orb sizes
+const MIN_TARGET_SIZE = 30;
 
 // For some reason I couldn't get enum to work right...
 const GameState = {
@@ -151,15 +152,34 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     });
   },
 
-  // "Private" helper function
   _generateTarget: () => {
-    const size = Math.random() * MAX_TARGET_SIZE + 30;
+    const canvas = document.querySelector('.game-canvas');
+    if (!canvas) {
+      console.error("Game canvas not found!");
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const canvasWidth = rect.width;
+    const canvasHeight = rect.height;
+    const HUD_OFFSET_Y = 80;
+
+    const size = Math.random() * MAX_TARGET_SIZE + MIN_TARGET_SIZE;
+    const radius = size / 2;
+
+    // The available space for the CENTER of the circle is the canvas dimension minus a radius on each side.
+    // The reason this was necessary was because I found as I was generating the circles from the center point, it would bleed
+    // opver edge of the playing area so I needed to generate a center point that is at least one radius away from every edge.
+    const effectiveWidth = canvasWidth - size;
+    const effectiveHeight = canvasHeight - size - HUD_OFFSET_Y;
+
     const newTarget: Target = {
       id: Date.now(),
-      x: Math.random() * (window.innerWidth - size * 2) + size,
-      y: Math.random() * (window.innerHeight - size * 2 - 80) + size + 80,
+      x: Math.random() * effectiveWidth + radius,
+      y: (Math.random() * effectiveHeight + radius) + HUD_OFFSET_Y,
       size: size,
     };
+
     set({ targets: [newTarget] });
   },
 }));
