@@ -4,8 +4,11 @@
   position: fixed;
   top: 0;
   left: 0;
-  background-color: #242424;
-  cursor: crosshair;
+  background-color: #1a1a1a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: default;
   overflow: hidden;
 }
 
@@ -36,6 +39,20 @@
   background-color: #1a1a1a;
   padding: 0.5rem 1.5rem;
   border-radius: 8px;
+}
+
+/* This is basically the fixed-size playable area */
+.game-canvas {
+  width: 90vw;
+  height: 80vh;
+  max-width: 1200px;
+  max-height: 800px;
+  position: relative;
+  background-color: #242424;
+  border: 2px solid #444;
+  border-radius: 8px;
+  cursor: crosshair;
+  overflow: hidden;
 }
 
 .target {

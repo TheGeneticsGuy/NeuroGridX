@@ -36,13 +36,13 @@ const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({
                     color: "white",
                     padding: "6px 10px",
                     borderRadius: "4px",
-                    pointerEvents: "none", // IMPORTANT!
+                    pointerEvents: "none",
                     whiteSpace: "nowrap",
                     zIndex: 1000,
                 }}
                 >
                     {text}
-                </div>
+                </div> // Text is my parameter. I can add additional parameters.
             )}
         </div>
     );
