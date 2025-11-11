@@ -100,63 +100,65 @@ const ReactionTimePage: React.FC = () => {
   const averageClickAccuracy = clickAccuracies.length > 0
     ? (clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length * 100).toFixed(2)
     : 'N/A';
-
   return (
-    <div className="game-container" onClick={onGameAreaClick}>
-      {gameState === 'NotStarted' && (
-        <div className="game-overlay">
-          <h1>Reaction Time Challenge</h1>
+    <div className="game-container">
+      <div className="game-canvas" onClick={onGameAreaClick}>
 
-          {/* --- NEW: Inline stats card for logged-in users --- */}
-          {isAuthenticated && !loadingStats && userAttempts.length > 0 && (
-            <div className="stat-card-inline">
-              <h3>Your Stats</h3>
-              <ReactionTimeStatCard attempts={userAttempts} />
+        {/* The HUD is now correctly placed INSIDE the canvas again */}
+        {gameState === 'InProgress' && (
+          <div className="game-hud">
+            <div>Time: {formatTime(timeRemaining)}</div>
+            <div>Score: {score}</div>
+            <div>NTPM: {ntpm}</div>
+          </div>
+        )}
+
+        {gameState === 'NotStarted' && (
+          <div className="game-overlay">
+            {/* ... overlay content ... */}
+            <h1>Reaction Time Challenge</h1>
+            {isAuthenticated && !loadingStats && userAttempts.length > 0 && (
+              <div className="stat-card-inline">
+                <h3>Your Stats</h3>
+                <ReactionTimeStatCard attempts={userAttempts} />
+              </div>
+            )}
+            <p>Click as many targets as you can in {totalTime} seconds.</p>
+            <p>Points are awarded based on how close you click to the center.</p>
+            <button onClick={startGameHandler} className="cta-button">
+              Start Game
+            </button>
+          </div>
+        )}
+
+        {gameState === 'Finished' && (
+            <div className="game-overlay">
+              <h1>Time's Up!</h1>
+              <p>Final Score: {score}</p>
+              <p>Total Hits: {hits}</p>
+              <p>Total Misses: {misses}</p>
+              <p>Net Targets Per Minute (NTPM): {ntpm}</p>
+              <p>Average Click Accuracy to Center: {averageClickAccuracy}%</p>
+              {isAuthenticated ? <p>Your score has been saved.</p> : <p>Login to save your scores!</p>}
+              <button onClick={startGameHandler} className="cta-button">Play Again</button>
             </div>
           )}
 
-          <p>Click as many targets as you can in {totalTime} seconds.</p>
-          <p>Points are awarded based on how close you click to the center.</p>
-          <button onClick={startGameHandler} className="cta-button">
-            Start Game
-          </button>
-        </div>
-      )}
-
-      {gameState === 'InProgress' && (
-        <div className="game-hud">
-          <div>Time: {formatTime(timeRemaining)}</div>
-          <div>Score: {score}</div>
-          <div>NTPM: {ntpm}</div>
-        </div>
-      )}
-
-      {gameState === 'Finished' && (
-         <div className="game-overlay">
-          <h1>Time's Up!</h1>
-          <p>Final Score: {score}</p>
-          <p>Total Hits: {hits}</p>
-          <p>Total Misses: {misses}</p>
-          <p>Net Targets Per Minute (NTPM): {ntpm}</p>
-          <p>Average Click Accuracy to Center: {averageClickAccuracy}%</p>
-          {isAuthenticated ? <p>Your score has been saved.</p> : <p>Login to save your scores!</p>}
-          <button onClick={startGameHandler} className="cta-button">Play Again</button>
-        </div>
-      )}
-
-      {gameState === 'InProgress' && targets.map(target => (
-        <div
-          key={target.id}
-          className="target"
-          style={{
-            left: `${target.x}px`, top: `${target.y}px`,
-            width: `${target.size}px`, height: `${target.size}px`,
-          }}
-          onClick={onTargetClick}
-        />
-      ))}
+        {gameState === 'InProgress' && targets.map(target => (
+          <div
+            key={target.id}
+            className="target"
+            style={{
+              left: `${target.x}px`, top: `${target.y}px`,
+              width: `${target.size}px`, height: `${target.size}px`,
+            }}
+            onClick={onTargetClick}
+          />
+        ))}
+      </div>
     </div>
   );
+
 };
 
 export default ReactionTimePage;
