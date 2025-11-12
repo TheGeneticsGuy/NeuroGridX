@@ -43,14 +43,14 @@ export const challenges: ChallengeConfig[] = [
         key: 'line-tracing',
         name: 'Line Tracing',
         path: '/challenges/line-tracing',
-        StatCardComponent: ({ attempts }) => <div>Coming Soon!</div>, // TODO: Pending build
+        StatCardComponent: ({ attempts: _}) => <div>Coming Soon!</div>, // TODO: Pending build
         isEnabled: false,
     },
     {
         key: 'velocity-control',
         name: 'Velocity Control',
         path: '/challenges/velocity-control',
-        StatCardComponent: ({ attempts }) => <div>Coming Soon!</div>,
+        StatCardComponent: ({ attempts: _ }) => <div>Coming Soon!</div>,
         isEnabled: false,
     }
 ];
