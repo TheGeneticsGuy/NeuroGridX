@@ -9,7 +9,7 @@ import { create } from 'zustand';
 
 const TOTAL_TIME = 60;        // Length of the challenge
 const MAX_TARGET_SIZE = 120;  // Orb sizes
-const MIN_TARGET_SIZE = 30;
+const MIN_TARGET_SIZE = 40;
 
 // For some reason I couldn't get enum to work right...
 const GameState = {
@@ -98,6 +98,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     const MAX_POINTS = 100;
     const MIN_POINTS_ON_HIT = 25;
     const BONUS_ON_ACCURACY = 50;
+    const PERCENT_MIN_BONUS = 0.85;
 
     if (distance <= radius) { // Valid hit
       // Calculate accuracy as a percentage (1.0 = center, 0.0 = edge)
@@ -105,7 +106,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
 
       // Linear scale from 100 down to 0
       let linearPoints = clickAccuracy * MAX_POINTS;
-      if (linearPoints >= (MAX_POINTS * .90)) { // 90% of greater gets full credit
+      if (Math.round(linearPoints) >= (MAX_POINTS * PERCENT_MIN_BONUS)) { // % of greater gets full credit
         linearPoints += BONUS_ON_ACCURACY;
       }
 

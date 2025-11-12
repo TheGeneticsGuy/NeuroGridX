@@ -1,0 +1,91 @@
+.interactive-target {
+  position: absolute;
+  transform: translate(-50%, -50%); /* Center on its coordinates */
+  border-radius: 50%;
+  cursor: crosshair;
+
+  /* Initialize the CSS variables */
+  --accuracy-percent: 0;
+  --cursor-x: 0px;
+  --cursor-y: 0px;
+
+  /* Colors for our gradient */
+  --color-start: rgb(255, 69, 58); /* Red */
+  --color-end: rgb(0, 255, 204); /* Turquoise */
+}
+
+/* The gradient circle that changes color */
+.target-gradient {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+
+  /* The magic: CSS calc() and color-mix() use our variable! */
+  background-color: color-mix(in srgb, var(--color-start), var(--color-end) calc(var(--accuracy-percent) * 100%));
+
+  transition: transform 0.1s ease-out;
+}
+
+/* A clean white outline */
+.target-outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid white;
+  border-radius: 50%;
+  box-sizing: border-box; /* Ensures border is inside */
+}
+
+.interactive-target:hover .target-gradient {
+  transform: scale(1.05);
+}
+
+/* The live accuracy tooltip that follows the cursor */
+.accuracy-tooltip {
+  position: absolute;
+  top: var(--cursor-y);
+  left: var(--cursor-x);
+
+  /* Use the variable to generate the text content! */
+  content: counter(accuracy);
+  counter-reset: accuracy calc(var(--accuracy-percent) * 100);
+
+  transform: translate(15px, -25px); /* Offset from cursor */
+
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  text-shadow: 0 1px 3px black;
+
+  pointer-events: none;
+  white-space: nowrap;
+
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.interactive-target:hover .accuracy-tooltip {
+  opacity: 1;
+}
+
+.accuracy-tooltip::after {
+  content: '%';
+  font-size: 0.8em;
+}
+
+.accuracy-tooltip::before {
+  content: counter(accuracy, decimal-fixed-1);
+}
+
+@counter-style decimal-fixed-1 {
+  system: extends decimal;
+  suffix: ".";
+  range: 0 9;
+}
+@counter-style decimal-fixed-1-fallback {
+  system: numeric;
+  symbols: '0' '1' '2' '3' '4' '5' '6' '7' '8' '9';
+  suffix: ".";
+}

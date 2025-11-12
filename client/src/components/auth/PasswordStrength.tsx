@@ -9,11 +9,11 @@ interface PasswordStrengthProps {
 }
 
 const rules = [
-  { test: (pw: string) => pw.length >= 8, label: 'At least 8 characters' },
-  { test: (pw: string) => /[a-z]/.test(pw), label: 'One lowercase letter' },
-  { test: (pw: string) => /[A-Z]/.test(pw), label: 'One uppercase letter' },
-  { test: (pw: string) => /\d/.test(pw), label: 'One number' },
-  { test: (pw: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pw), label: 'One special character' },
+  { test: (pw: string) => pw.length >= 8, label: ' At least 8 characters' },
+  { test: (pw: string) => /[a-z]/.test(pw), label: ' One lowercase letter' },
+  { test: (pw: string) => /[A-Z]/.test(pw), label: ' One uppercase letter' },
+  { test: (pw: string) => /\d/.test(pw), label: ' One number' },
+  { test: (pw: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pw), label: ' One special character' },
 ];
 
 const checkPasswordStrength = (password: string) => {
