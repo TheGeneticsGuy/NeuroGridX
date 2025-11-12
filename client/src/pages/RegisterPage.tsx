@@ -81,6 +81,7 @@ const RegisterPage: React.FC = () => {
             required
             title="Please enter your first name." // Custom tooltip text
             aria-label="First Name" // Accessibility
+            maxLength={40}
           />
         </div>
         <div className="form-group">
@@ -94,6 +95,7 @@ const RegisterPage: React.FC = () => {
             required
             title="Please enter your last name."
             aria-label="Last Name"
+            maxLength={40}
           />
         </div>
         <div className="form-group">
@@ -107,6 +109,7 @@ const RegisterPage: React.FC = () => {
             required
             title="Please enter a valid email address."
             aria-label="Email Address"
+            maxLength={40}
           />
         </div>
         <div className="form-group">
@@ -115,11 +118,12 @@ const RegisterPage: React.FC = () => {
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
-              className="form-input"
+              className="form-input pw-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
+              maxLength={30}
               title="Password must meet the requirements below."
               aria-label="Password"
             />

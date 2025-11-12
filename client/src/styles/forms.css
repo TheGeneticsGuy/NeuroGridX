@@ -38,6 +38,10 @@
   box-sizing: border-box;
 }
 
+.pw-input {
+  padding-right: 2rem;
+}
+
 .form-button {
   width: 100%;
   padding: 0.75rem;
@@ -89,12 +93,13 @@
 .password-wrapper {
   position: relative;
   width: 100%;
+  padding-right: 5rem;
 }
 
 .password-toggle-btn {
   position: absolute;
   top: 50%;
-  right: 10px;
+  right: 80px;
   transform: translateY(-50%);
   background: none;
   border: none;
