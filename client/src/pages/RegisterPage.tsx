@@ -5,7 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import ValidationErrors from '../components/common/ValidationErrors';
 import PasswordStrength from '../components/auth/PasswordStrength';
-
+import { EyeOpenIcon, EyeClosedIcon } from '../assets/EyeIcon'; // Import icons
 import axios from 'axios';
 import '../styles/forms.css';
 
@@ -16,7 +16,8 @@ const RegisterPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [errors, setErrors] = useState<string[]>([])
+  const [errors, setErrors] = useState<string[]>([]);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
@@ -68,7 +69,7 @@ const RegisterPage: React.FC = () => {
     <div className="form-container">
       <h1>Create an Account</h1>
       <ValidationErrors errors={errors} />
-      <form onSubmit={handleRegister}>
+      <form onSubmit={handleRegister} noValidate> {/* noValidate prevents default browser tooltips */}
         <div className="form-group">
           <label htmlFor="firstName">First Name</label>
           <input
@@ -78,6 +79,9 @@ const RegisterPage: React.FC = () => {
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
             required
+            title="Please enter your first name." // Custom tooltip text
+            aria-label="First Name" // Accessibility
+            maxLength={40}
           />
         </div>
         <div className="form-group">
@@ -89,6 +93,9 @@ const RegisterPage: React.FC = () => {
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
             required
+            title="Please enter your last name."
+            aria-label="Last Name"
+            maxLength={40}
           />
         </div>
         <div className="form-group">
@@ -100,19 +107,36 @@ const RegisterPage: React.FC = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            title="Please enter a valid email address."
+            aria-label="Email Address"
+            maxLength={40}
           />
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            className="form-input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
+          <div className="password-wrapper">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              className="form-input pw-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              maxLength={30}
+              title="Password must meet the requirements below."
+              aria-label="Password"
+            />
+            <button
+              type="button" // Important: prevents form submission
+              className="password-toggle-btn"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+            </button>
+          </div>
           <PasswordStrength password={password} />
         </div>
         <button type="submit" className="form-button">Create Account</button>

@@ -1,5 +1,5 @@
 .app-header {
-  background-color: #1a1a1a;
+  background-color: var(--color-background);
   padding: 1rem 2rem;
   border-bottom: 1px solid #333;
   width: 100%;
@@ -21,7 +21,7 @@
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-logo);
   text-decoration: none;
 }
 
@@ -33,18 +33,19 @@
 
 .nav-links a,
 .nav-links .user-info {
-  color: #ddd;
+  color: var(--color-nav-links);
   text-decoration: none;
   font-size: 1rem;
+  font-weight: 700;
   transition: color 0.2s ease-in-out;
 }
 
 .nav-links a:hover {
-  color: #646cff;
+  color: var(--color-primary);
 }
 
 .logout-button {
-  background-color: #646cff;
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -55,5 +56,11 @@
 }
 
 .logout-button:hover {
-  background-color: #535bf2;
+  background-color: var(--color-primary-hover);
+}
+
+.nav-and-toggle {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }

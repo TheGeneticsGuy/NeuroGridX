@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
+import ThemeToggle from '../common/ThemeToggle';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -19,12 +20,15 @@ const Header: React.FC = () => {
         <Link to="/" className="logo">
           NeuroGrid
         </Link>
+        <div>
+          <ThemeToggle /> MODE
+        </div>
         <nav>
           <div className="nav-links">
             <Link to="/challenges">Challenges</Link>
 
             {isAuthenticated ? (
-              <> {/* Use a React Fragment */}
+              <> {/* Using a React Fragment */}
                 <Link to="/dashboard">Dashboard</Link>
                 <span className="user-info">Role: {user?.role}</span>   {/*TESTING ROLE - TODO: Remove */}
                 <button onClick={handleLogout} className="logout-button">
@@ -32,7 +36,7 @@ const Header: React.FC = () => {
                 </button>
               </>
             ) : (
-              <> {/* Use a React Fragment */}
+              <> {/* Using a React Fragment */}
                 <Link to="/login">Login</Link>
               </>
             )}

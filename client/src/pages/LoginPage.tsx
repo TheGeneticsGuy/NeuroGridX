@@ -65,6 +65,9 @@ const LoginPage: React.FC = () => {
             className="form-input"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            title="Please enter your email address."
+            aria-label="Email Address"
+            maxLength={40}
             required
           />
         </div>
@@ -76,6 +79,10 @@ const LoginPage: React.FC = () => {
             className="form-input"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={8}
+            maxLength={30}
+            title="Please enter you password."
+            aria-label="Password"
             required
           />
         </div>

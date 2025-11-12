@@ -16,7 +16,7 @@
 }
 
 .dashboard-header p {
-  color: #ccc;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
 }
 
@@ -34,7 +34,7 @@
 }
 
 .attempts-table th {
-  background-color: #2c2c2c;
+  background-color: var(--color-background-mute);
   font-weight: bold;
 }
 
@@ -52,5 +52,5 @@
 }
 
 .error-message {
-  color: #ff6b6b;
+  color: var(--color-danger);
 }

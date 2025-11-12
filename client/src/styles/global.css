@@ -1,29 +1,62 @@
 :root {
-  font-family: 'Poppins', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --font-sans: 'Poppins', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --color-background: #1a1a1a;
+  --color-background-soft: #242424;
+  --color-background-mute: #2c2c2c;
+  --color-border: #444;
+  --color-text-primary: rgba(255, 255, 255, 0.87);
+  --color-text-secondary: #ccc;
+  --color-primary: #646cff;
+  --color-primary-hover: #535bf2;
+  --color-accent: #8187ff;
+  --color-danger: #ff6b6b;
+  --color-danger-soft-bg: #442c2c;
+  --color-danger-soft-text: #ffc9c9;
+  --color-card-blur: null;
+  --color-logo: #fff;
+  --color-nav-links: #ddd;
+  --form-input-background: #3f3f3f;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/*Override default when the <html> element has the data-theme="light" attribute*/
+[data-theme='light'] {
+  --color-background: #f9f9f9;
+  --color-background-soft: #ffffff;
+  --color-background-mute: #f0f0f0;
+  --color-border: #e0e0e0;
+  --color-text-primary: #213547;
+  --color-text-secondary: #000;
+  --color-danger: #e74c3c;
+  --color-danger-soft-bg: #ffe8e8;
+  --color-danger-soft-text: #c0392b;
+  --color-card-blur: rgb(139, 138, 138);
+  --color-logo: black;
+  --color-nav-links: black;
+  --form-input-background: #fff;
 }
 
 body {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+
+  font-synthesis: none;
+  font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  transition: color 0.2s, background-color 0.2s; /* Smooth theme transition */
 }
 
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%;
   padding: 2rem;
-  text-align: center;
 }
