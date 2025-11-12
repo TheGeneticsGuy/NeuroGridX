@@ -13,6 +13,10 @@
   --color-danger: #ff6b6b;
   --color-danger-soft-bg: #442c2c;
   --color-danger-soft-text: #ffc9c9;
+  --color-card-blur: null;
+  --color-logo: #fff;
+  --color-nav-links: #ddd;
+  --form-input-background: #3f3f3f;
 }
 
 /*Override default when the <html> element has the data-theme="light" attribute*/
@@ -22,10 +26,14 @@
   --color-background-mute: #f0f0f0;
   --color-border: #e0e0e0;
   --color-text-primary: #213547;
-  --color-text-secondary: #555;
+  --color-text-secondary: #000;
   --color-danger: #e74c3c;
   --color-danger-soft-bg: #ffe8e8;
   --color-danger-soft-text: #c0392b;
+  --color-card-blur: rgb(139, 138, 138);
+  --color-logo: black;
+  --color-nav-links: black;
+  --form-input-background: #fff;
 }
 
 body {
@@ -37,7 +45,7 @@ body {
   background-color: var(--color-background);
 
   font-synthesis: none;
-  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "clig" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 

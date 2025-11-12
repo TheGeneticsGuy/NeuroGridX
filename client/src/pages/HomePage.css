@@ -2,12 +2,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
 }
 
 .home-container p {
   font-size: 1.1rem;
-  color: #ccc;
+  color: var(--color-text-secondary);
+  margin: 0.5rem;
 }
 
 .call-to-action {
@@ -32,6 +32,6 @@
 }
 
 .login-prompt-link {
-    color: var(--color-accent);
+    color: var(--color-primary);
     text-decoration: underline;
 }

@@ -107,15 +107,15 @@ const ReactionTimePage: React.FC = () => {
         {/* The HUD is now correctly placed INSIDE the canvas again */}
         {gameState === 'InProgress' && (
           <div className="game-hud">
-            <div>Time: {formatTime(timeRemaining)}</div>
-            <div>Score: {score}</div>
-            <div>NTPM: {ntpm}</div>
+            <div className="hud-item">Time: {formatTime(timeRemaining)}</div>
+            <div className="hud-item">Score: {score}</div>
+            <div className="hud-item">NTPM: {ntpm}</div>
           </div>
         )}
 
         {gameState === 'NotStarted' && (
           <div className="game-overlay">
-            {/* ... overlay content ... */}
+            {/* Overlay content */}
             <h1>Reaction Time Challenge</h1>
             {isAuthenticated && !loadingStats && userAttempts.length > 0 && (
               <div className="stat-card-inline">

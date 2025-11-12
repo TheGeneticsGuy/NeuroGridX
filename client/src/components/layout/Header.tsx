@@ -28,7 +28,7 @@ const Header: React.FC = () => {
             <Link to="/challenges">Challenges</Link>
 
             {isAuthenticated ? (
-              <> {/* Use a React Fragment */}
+              <> {/* Using a React Fragment */}
                 <Link to="/dashboard">Dashboard</Link>
                 <span className="user-info">Role: {user?.role}</span>   {/*TESTING ROLE - TODO: Remove */}
                 <button onClick={handleLogout} className="logout-button">
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
                 </button>
               </>
             ) : (
-              <> {/* Use a React Fragment */}
+              <> {/* Using a React Fragment */}
                 <Link to="/login">Login</Link>
               </>
             )}

@@ -6,5 +6,9 @@
   box-sizing: border-box;
   margin-top: auto;
   text-align: center;
-  color: #888;
+  color: var(--color-text-primary)
+}
+
+.app-footer p {
+  margin: 0.3rem;
 }

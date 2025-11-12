@@ -8,6 +8,7 @@
   margin: 2rem auto;
   background-color: var(--color-background-mute);
   border-radius: 8px;
+  box-shadow: 10px 10px 5px var(--color-card-blur);
 }
 
 .form-container h1 {
@@ -23,15 +24,16 @@
   display: block;
   margin-bottom: 0.5rem;
   text-align: left;
+  color: var(--color-logo);
 }
 
 .form-input {
   width: 100%;
   padding: 0.75rem;
-  background-color: #3f3f3f;
+  background-color: var(--form-input-background);
   border: 1px solid #555;
   border-radius: 4px;
-  color: #fff;
+  color: var(--color-logo);
   font-size: 1rem;
   box-sizing: border-box;
 }
@@ -63,17 +65,17 @@
 }
 
 .form-divider span {
-  background: #2c2c2c;
+  background: var(--color-background-mute);
   padding: 0 10px;
 }
 
 .form-link {
   margin-top: 1.5rem;
-  color: #ccc;
+  color: var(--color-text-secondary);
 }
 
 .form-link a {
-  color: var(--color-accent);
+  color: var(--color-primary);
   text-decoration: underline;
 }
 
@@ -82,4 +84,27 @@
     display: flex;
     justify-content: center;
     margin-top: 1rem;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn:hover {
+    color: var(--color-text-primary);
 }

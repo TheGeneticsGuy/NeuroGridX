@@ -16,7 +16,7 @@
 }
 
 .dashboard-header p {
-  color: #ccc;
+  color: var(--color-text-secondary);
   font-size: 1.1rem;
 }
 
