@@ -20,7 +20,7 @@ app.set('trust proxy', 1);  // Necessary for my Oauth
 
 const allowedOrigins = [
   'http://localhost:5173', // Local frontend
-  // Render Deployment
+  'https://neurogrid-client.onrender.com/login'
 ];
 
 const options: cors.CorsOptions = {
