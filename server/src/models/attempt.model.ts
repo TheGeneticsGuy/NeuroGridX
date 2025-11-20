@@ -8,6 +8,10 @@ export interface IAttempt extends Document {
   accuracy: number;
   ntpm?: number; // Net Targets Per Minute
   averageClickAccuracy?: number; // 0 to 1
+  settings?: {
+    mode: string; // Normal or Advanced
+    speed?: string; //'Normal', 'Medium', 'Fast'
+  };
 }
 
 const attemptSchema: Schema<IAttempt> = new Schema(
@@ -17,13 +21,10 @@ const attemptSchema: Schema<IAttempt> = new Schema(
     score: { type: Number, required: true },
     completionTime: { type: Number, required: true },
     accuracy: { type: Number, required: true },
-    ntpm: { type: Number, required: false }, // Optional field (for now)
-    averageClickAccuracy: { type: Number, required: false }, // Optional field
-  },
-  {
-    timestamps: true,
-  }
-);
+    ntpm: { type: Number, required: false },
+    averageClickAccuracy: { type: Number, required: false },
+    settings: { type: Object, required: false },
+  }, { timestamps: true });
 
 const Attempt = mongoose.model<IAttempt>('Attempt', attemptSchema);
 

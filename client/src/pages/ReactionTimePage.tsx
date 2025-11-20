@@ -30,7 +30,7 @@ const formatTime = (seconds: number) => {
 const ReactionTimePage: React.FC = () => {
   const {
     gameState, score, hits, misses, timeRemaining, targets, clickAccuracies,
-    startGame, handleHit, handleMiss, resetGame, gameSettings // <-- ADD gameSettings
+    startGame, handleHit, handleMiss, resetGame, gameSettings
   } = useGameStore();
 
   const { isAuthenticated, token } = useAuthStore();
@@ -38,11 +38,9 @@ const ReactionTimePage: React.FC = () => {
   const [loadingStats, setLoadingStats] = useState(true);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
-  // --- NEW: State for game settings ---
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
   const [speed, setSpeed] = useState<'Normal' | 'Medium' | 'Fast'>('Normal');
 
-  // --- No changes to useEffects below, except for saveScore ---
   useEffect(() => {
     return () => { resetGame(); };
   }, [resetGame]);
@@ -72,7 +70,6 @@ const ReactionTimePage: React.FC = () => {
       const ntpm = hits - misses;
       const averageClickAccuracy = clickAccuracies.length > 0 ? clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length : 0;
 
-      // --- UPDATED: Send game settings to backend ---
       if (gameState === 'Finished' && isAuthenticated && token) {
         try {
           const finalScore = {
@@ -88,7 +85,7 @@ const ReactionTimePage: React.FC = () => {
           });
           console.log("Score saved successfully!");
         } catch (error) {
-          console.error("Failed to save score:", error);
+          console.error("Failed to save score:", error); // just debugging
         }
       }
     };
@@ -103,7 +100,6 @@ const ReactionTimePage: React.FC = () => {
   const onTargetClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
-    // --- UPDATED: Visual scoring logic now accounts for multipliers ---
     const { gameSettings } = useGameStore.getState();
     const speedMultipliers = { Normal: 1.33, Medium: 1.66, Fast: 2.0 };
     const speedMultiplier = gameSettings.isAdvanced ? speedMultipliers[gameSettings.speed] : 1;
@@ -143,7 +139,6 @@ const ReactionTimePage: React.FC = () => {
     handleHit(e.clientX, e.clientY, e.currentTarget);
   };
 
-  // --- UPDATED: startGameHandler now passes settings ---
   const startGameHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     startGame({ isAdvanced: isAdvancedMode, speed });
@@ -225,6 +220,32 @@ const ReactionTimePage: React.FC = () => {
               <p>Net Targets Per Minute (NTPM): {ntpm}</p>
               <p>Average Click Accuracy to Center: {averageClickAccuracy}%</p>
               {isAuthenticated ? <p>Your score has been saved.</p> : <p>Login to save your scores!</p>}
+
+              <div className="game-settings">
+                <div className="setting-row">
+                  <label htmlFor="advanced-toggle">Advanced Mode</label>
+                  <label className="theme-toggle" title="Toggle Advanced Mode">
+                    <input
+                      type="checkbox"
+                      id="advanced-toggle"
+                      checked={isAdvancedMode}
+                      onChange={() => setIsAdvancedMode(!isAdvancedMode)}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+                {isAdvancedMode && (
+                  <div className="setting-row">
+                    <label>Target Speed</label>
+                    <div className="speed-selector">
+                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setSpeed('Normal')}>Normal</button>
+                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setSpeed('Medium')}>Medium</button>
+                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setSpeed('Fast')}>Fast</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button onClick={startGameHandler} className="cta-button">Play Again</button>
             </div>
           )}
