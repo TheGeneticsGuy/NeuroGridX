@@ -143,7 +143,9 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
   handleMiss: () => {
     if (get().gameState !== GameState.InProgress) return;
 
-    const MISS_PENALTY = 25;
+    const { gameSettings } = get();
+    const speedMultiplier = gameSettings.isAdvanced ? SPEED_MULTIPLIERS[gameSettings.speed] : 1;
+    const MISS_PENALTY = Math.round(25 * speedMultiplier);
 
     set((state) => ({
       misses: state.misses + 1,
