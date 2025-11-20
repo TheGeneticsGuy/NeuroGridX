@@ -1,32 +1,27 @@
 .interactive-target {
   position: absolute;
-  transform: translate(-50%, -50%); /* Center on its coordinates */
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   cursor: crosshair;
 
-  /* Initialize the CSS variables */
   --accuracy-percent: 0;
   --cursor-x: 0px;
   --cursor-y: 0px;
 
-  /* Colors for our gradient */
-  --color-start: rgb(255, 69, 58); /* Red */
-  --color-end: rgb(0, 255, 204); /* Turquoise */
+  --color-start: rgb(255, 69, 58);
+  --color-end: rgb(0, 255, 204);
 }
 
-/* The gradient circle that changes color */
 .target-gradient {
   width: 100%;
   height: 100%;
   border-radius: 50%;
 
-  /* The magic: CSS calc() and color-mix() use our variable! */
   background-color: color-mix(in srgb, var(--color-start), var(--color-end) calc(var(--accuracy-percent) * 100%));
 
   transition: transform 0.1s ease-out;
 }
 
-/* A clean white outline */
 .target-outline {
   position: absolute;
   top: 0;
@@ -35,24 +30,22 @@
   height: 100%;
   border: 2px solid white;
   border-radius: 50%;
-  box-sizing: border-box; /* Ensures border is inside */
+  box-sizing: border-box;
 }
 
 .interactive-target:hover .target-gradient {
   transform: scale(1.05);
 }
 
-/* The live accuracy tooltip that follows the cursor */
 .accuracy-tooltip {
   position: absolute;
   top: var(--cursor-y);
   left: var(--cursor-x);
 
-  /* Use the variable to generate the text content! */
   content: counter(accuracy);
   counter-reset: accuracy calc(var(--accuracy-percent) * 100);
 
-  transform: translate(15px, -25px); /* Offset from cursor */
+  transform: translate(15px, -25px);
 
   color: white;
   font-weight: bold;

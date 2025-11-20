@@ -95,9 +95,9 @@ const ReactionTimePage: React.FC = () => {
     }
   }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies, gameSettings]);
 
-  const onGameAreaClick = () => { handleMiss(); };
+  const onGameAreaMouseDown = () => { handleMiss(); };
 
-  const onTargetClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onTargetMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
 
     const { gameSettings } = useGameStore.getState();
@@ -160,7 +160,7 @@ const ReactionTimePage: React.FC = () => {
       </div>
 
       <div className="challenge-canvas-area">
-        <div className="game-canvas" onClick={onGameAreaClick}>
+        <div className="game-canvas" onMouseDown={onGameAreaMouseDown}>
           {gameState === 'NotStarted' && (
             <div className="game-overlay">
               <h1>Reaction Time Challenge</h1>
@@ -171,7 +171,6 @@ const ReactionTimePage: React.FC = () => {
                 </div>
               )}
 
-              {/* --- NEW: Advanced Mode Settings UI --- */}
               <div className="game-settings">
                 <div className="setting-row">
                   <label htmlFor="advanced-toggle">Advanced Mode</label>
@@ -257,7 +256,7 @@ const ReactionTimePage: React.FC = () => {
               x={target.x}
               y={target.y}
               size={target.size}
-              onClick={onTargetClick}
+              onMouseDown={onTargetMouseDown}
             />
           ))}
 

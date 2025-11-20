@@ -6,10 +6,10 @@ interface InteractiveTargetProps {
   x: number;
   y: number;
   size: number;
-  onClick: (e: MouseEvent<HTMLDivElement>) => void;
+  onMouseDown: (e: MouseEvent<HTMLDivElement>) => void;
 }
 
-const InteractiveTarget: React.FC<InteractiveTargetProps> = ({ x, y, size, onClick }) => {
+const InteractiveTarget: React.FC<InteractiveTargetProps> = ({ x, y, size, onMouseDown }) => {
   const targetRef = useRef<HTMLDivElement>(null);
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
@@ -57,7 +57,7 @@ const InteractiveTarget: React.FC<InteractiveTargetProps> = ({ x, y, size, onCli
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onClick={onClick}
+      onMouseDown={onMouseDown}
     >
       <div className="target-gradient"></div>
       <div className="target-outline"></div>
