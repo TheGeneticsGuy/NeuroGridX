@@ -169,3 +169,50 @@
     opacity: 0;
   }
 }
+
+.game-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 400px;
+}
+
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-row label {
+  font-weight: bold;
+}
+
+.speed-selector {
+  display: flex;
+  gap: 0.5rem;
+  background-color: var(--color-background-mute);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+.speed-selector button {
+  padding: 0.5rem 1rem;
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.speed-selector button.active {
+  background-color: var(--color-primary);
+  color: white;
+}
