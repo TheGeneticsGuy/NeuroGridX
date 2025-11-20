@@ -218,3 +218,10 @@
   color: white;
 }
 
+.floating-score.penalty {
+  color: #ff6b6b;
+  font-size: 1.3rem;
+  font-weight: bold;
+  -webkit-text-stroke: 1px black;
+  /* look at the floating up animation for non penalty score above */
+}

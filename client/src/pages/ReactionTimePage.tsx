@@ -95,7 +95,33 @@ const ReactionTimePage: React.FC = () => {
     }
   }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies, gameSettings]);
 
-  const onGameAreaMouseDown = () => { handleMiss(); };
+  // For the miss text
+  const onGameAreaMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+
+    if (useGameStore.getState().gameState !== 'InProgress') return; //  Need to NOT register score if the game isn't running.
+
+    const { gameSettings } = useGameStore.getState();
+    const speedMultipliers = { Normal: 1.33, Medium: 1.66, Fast: 2.0 };
+    const speedMultiplier = gameSettings.isAdvanced ? speedMultipliers[gameSettings.speed] : 1;
+
+    const MISS_PENALTY = Math.round(25 * speedMultiplier); // The negative points are also worse when faster. Upping the challenge!
+
+    const penaltyText: FloatingText = {
+      id: Date.now(),
+      x: e.clientX,
+      y: e.clientY,
+      text: `-${MISS_PENALTY}`,
+      className: 'penalty',
+    };
+    setFloatingTexts(prev => [...prev, penaltyText]);
+
+    // Clear it after animation, like other text
+    setTimeout(() => {
+      setFloatingTexts(prev => prev.filter(ft => ft.id !== penaltyText.id));
+    }, 800);
+
+    handleMiss();
+  };
 
   const onTargetMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
