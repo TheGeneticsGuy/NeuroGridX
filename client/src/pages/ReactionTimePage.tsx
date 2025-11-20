@@ -6,6 +6,7 @@ import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTim
 import InteractiveTarget from '../components/game/InteractiveTarget';
 import { type Attempt } from '../config/challenges.config';
 import './ReactionTimePage.css';
+import { useUIStore } from '../store/ui.store';
 
 // --- No changes to constants or interfaces ---
 const TOTAL_TIME = 60;
@@ -37,9 +38,8 @@ const ReactionTimePage: React.FC = () => {
   const [userAttempts, setUserAttempts] = useState<Attempt[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
-
-  const [isAdvancedMode, setIsAdvancedMode] = useState(false);
-  const [speed, setSpeed] = useState<'Normal' | 'Medium' | 'Fast'>('Normal');
+  const { gameSettings: uiGameSettings, setGameSettings } = useUIStore();
+  const { isAdvanced: isAdvancedMode, speed } = uiGameSettings;
 
   useEffect(() => {
     return () => { resetGame(); };
@@ -205,7 +205,7 @@ const ReactionTimePage: React.FC = () => {
                       type="checkbox"
                       id="advanced-toggle"
                       checked={isAdvancedMode}
-                      onChange={() => setIsAdvancedMode(!isAdvancedMode)}
+                      onChange={() => setGameSettings({ isAdvanced: !isAdvancedMode })}
                     />
                     <span className="slider"></span>
                   </label>
@@ -214,9 +214,9 @@ const ReactionTimePage: React.FC = () => {
                   <div className="setting-row">
                     <label>Target Speed</label>
                     <div className="speed-selector">
-                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setSpeed('Normal')}>Normal</button>
-                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setSpeed('Medium')}>Medium</button>
-                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setSpeed('Fast')}>Fast</button>
+                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Normal' })}>Normal</button>
+                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Medium' })}>Medium</button>
+                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Fast' })}>Fast</button>
                     </div>
                   </div>
                 )}
@@ -254,7 +254,7 @@ const ReactionTimePage: React.FC = () => {
                       type="checkbox"
                       id="advanced-toggle"
                       checked={isAdvancedMode}
-                      onChange={() => setIsAdvancedMode(!isAdvancedMode)}
+                      onChange={() => setGameSettings({ isAdvanced: !isAdvancedMode })}
                     />
                     <span className="slider"></span>
                   </label>
@@ -263,9 +263,9 @@ const ReactionTimePage: React.FC = () => {
                   <div className="setting-row">
                     <label>Target Speed</label>
                     <div className="speed-selector">
-                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setSpeed('Normal')}>Normal</button>
-                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setSpeed('Medium')}>Medium</button>
-                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setSpeed('Fast')}>Fast</button>
+                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Normal' })}>Normal</button>
+                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Medium' })}>Medium</button>
+                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Fast' })}>Fast</button>
                     </div>
                   </div>
                 )}
