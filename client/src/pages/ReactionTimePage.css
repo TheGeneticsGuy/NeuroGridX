@@ -87,6 +87,10 @@
   color: #fff;
 }
 
+.game-overlay p {
+  margin: 10px;
+}
+
 .stat-card-inline {
   background-color: rgba(0, 0, 0, 0.2);
   border: 1px solid #555;
