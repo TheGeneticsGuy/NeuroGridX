@@ -44,12 +44,16 @@ export interface IUser extends Document {
   googleId?: string;
   role: 'Standard' | 'BCI' | 'Admin';
   matchPassword(enteredPassword: string): Promise<boolean>;
+  bio?: string;
+  avatarUrl?: string;
 }
 
 const userSchema: Schema<IUser> = new Schema({
   email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
   firstName: { type: String, required: false },
   lastName: { type: String, required: false },
+  bio: { type: String, required: false },
+  avatarUrl: { type: String, required: false },
   password: { type: String, required: false },
   googleId: { type: String, required: false },
   role: { type: String, required: true, enum: ['Standard', 'BCI', 'Admin'], default: 'Standard' },
