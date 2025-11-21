@@ -13,6 +13,10 @@ export interface Attempt {
     ntpm?: number;
     averageClickAccuracy?: number;
     createdAt: string;
+    settings?: { // Optional because some might just leave it as default
+      mode: 'Normal' | 'Advanced';
+      speed?: 'Normal' | 'Medium' | 'Fast';
+    };
 }
 
 // Every Challenge stat card component will receive

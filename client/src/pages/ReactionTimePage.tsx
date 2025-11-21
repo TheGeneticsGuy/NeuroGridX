@@ -3,10 +3,12 @@ import { useAuthStore } from '../store/auth.store';
 import { useGameStore } from '../store/game.store';
 import axios from 'axios';
 import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTimeStatCard';
-import InteractiveTarget from '../components/game/InteractiveTarget'; // Import new component
+import InteractiveTarget from '../components/game/InteractiveTarget';
 import { type Attempt } from '../config/challenges.config';
 import './ReactionTimePage.css';
+import { useUIStore } from '../store/ui.store';
 
+// --- No changes to constants or interfaces ---
 const TOTAL_TIME = 60;
 const MAX_POINTS = 100;
 const MIN_POINTS = 25;
@@ -20,21 +22,24 @@ interface FloatingText {
 }
 
 const formatTime = (seconds: number) => {
-  const mins = Math.floor(seconds / TOTAL_TIME).toString().padStart(2, '0');
-  const secs = (seconds % TOTAL_TIME).toString().padStart(2, '0');
+  const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const secs = (seconds % 60).toString().padStart(2, '0');
   return `${mins}:${secs}`;
 };
+
 
 const ReactionTimePage: React.FC = () => {
   const {
     gameState, score, hits, misses, timeRemaining, targets, clickAccuracies,
-    startGame, handleHit, handleMiss, resetGame
+    startGame, handleHit, handleMiss, resetGame, gameSettings
   } = useGameStore();
 
   const { isAuthenticated, token } = useAuthStore();
   const [userAttempts, setUserAttempts] = useState<Attempt[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
-  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]); // The floating scores
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+  const { gameSettings: uiGameSettings, setGameSettings } = useUIStore();
+  const { isAdvanced: isAdvancedMode, speed } = uiGameSettings;
 
   useEffect(() => {
     return () => { resetGame(); };
@@ -49,7 +54,7 @@ const ReactionTimePage: React.FC = () => {
           const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/challenges/attempts/my-attempts`, config);
           setUserAttempts(response.data);
         } catch (error) {
-          console.error("Failed to get user stats:", error);
+          console.error("Failed to fetch user stats:", error);
         } finally {
           setLoadingStats(false);
         }
@@ -70,13 +75,17 @@ const ReactionTimePage: React.FC = () => {
           const finalScore = {
             challengeType: 'Reaction Time', score, completionTime: TOTAL_TIME,
             accuracy: hits > 0 ? hits / (hits + misses) : 0, ntpm, averageClickAccuracy,
+            settings: {
+              mode: gameSettings.isAdvanced ? 'Advanced' : 'Normal',
+              speed: gameSettings.isAdvanced ? gameSettings.speed : undefined,
+            }
           };
           await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/challenges/attempts`, finalScore, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Score saved successfully!");
         } catch (error) {
-          console.error("Failed to save score:", error);
+          console.error("Failed to save score:", error); // just debugging
         }
       }
     };
@@ -84,13 +93,42 @@ const ReactionTimePage: React.FC = () => {
     if (gameState === 'Finished') {
       saveScore();
     }
-  }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies]);
+  }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies, gameSettings]);
 
-  const onGameAreaClick = () => { handleMiss(); };
+  // For the miss text
+  const onGameAreaMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
 
-  // create the floating text
-  const onTargetClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (useGameStore.getState().gameState !== 'InProgress') return; //  Need to NOT register score if the game isn't running.
+
+    const { gameSettings } = useGameStore.getState();
+    const speedMultipliers = { Normal: 1.33, Medium: 1.66, Fast: 2.0 };
+    const speedMultiplier = gameSettings.isAdvanced ? speedMultipliers[gameSettings.speed] : 1;
+
+    const MISS_PENALTY = Math.round(25 * speedMultiplier); // The negative points are also worse when faster. Upping the challenge!
+
+    const penaltyText: FloatingText = {
+      id: Date.now(),
+      x: e.clientX,
+      y: e.clientY,
+      text: `-${MISS_PENALTY}`,
+      className: 'penalty',
+    };
+    setFloatingTexts(prev => [...prev, penaltyText]);
+
+    // Clear it after animation, like other text
+    setTimeout(() => {
+      setFloatingTexts(prev => prev.filter(ft => ft.id !== penaltyText.id));
+    }, 800);
+
+    handleMiss();
+  };
+
+  const onTargetMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
+
+    const { gameSettings } = useGameStore.getState();
+    const speedMultipliers = { Normal: 1.33, Medium: 1.66, Fast: 2.0 };
+    const speedMultiplier = gameSettings.isAdvanced ? speedMultipliers[gameSettings.speed] : 1;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const radius = rect.width / 2;
@@ -100,29 +138,19 @@ const ReactionTimePage: React.FC = () => {
     const clickAccuracy = Math.max(0, 1 - (dist / radius));
 
     const linearPoints = clickAccuracy * MAX_POINTS;
-    const points = Math.round(Math.max(MIN_POINTS, linearPoints));
+    // Calculate base points with multiplier
+    const points = Math.round(Math.max(MIN_POINTS, linearPoints) * speedMultiplier);
 
     const BONUS_THRESHOLD = 0.85;
-    const BONUS_POINTS = 50;
+    // Calculate bonus points with multiplier
+    const BONUS_POINTS = Math.round(50 * speedMultiplier);
 
-    // Create floating text
-    const baseText: FloatingText = {
-      id: Date.now(),
-      x: e.clientX, // Appear exactly where clicked
-      y: e.clientY,
-      text: `+${points}`,
-    };
-
+    const baseText: FloatingText = { id: Date.now(), x: e.clientX, y: e.clientY, text: `+${points}` };
     setFloatingTexts(prev => [...prev, baseText]);
-    if (linearPoints >= (BONUS_THRESHOLD * MAX_POINTS)) {
+
+    if (clickAccuracy >= BONUS_THRESHOLD) {
       setTimeout(() => {
-        const bonusText: FloatingText = {
-          id: Date.now() + 1,
-          x: e.clientX,
-          y: e.clientY,
-          text: `+${BONUS_POINTS} BONUS!`,
-          className: 'bonus', // binding to special class
-        };
+        const bonusText: FloatingText = { id: Date.now() + 1, x: e.clientX, y: e.clientY, text: `+${BONUS_POINTS} BONUS!`, className: 'bonus' };
         setFloatingTexts(prev => [...prev, bonusText]);
         setTimeout(() => {
           setFloatingTexts(prev => prev.filter(ft => ft.id !== bonusText.id));
@@ -130,7 +158,6 @@ const ReactionTimePage: React.FC = () => {
       }, 100);
     }
 
-    // Remove it after animation finishes (800ms)
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(ft => ft.id !== baseText.id));
     }, 800);
@@ -140,30 +167,26 @@ const ReactionTimePage: React.FC = () => {
 
   const startGameHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    startGame();
+    startGame({ isAdvanced: isAdvancedMode, speed });
   };
 
   const ntpm = hits - misses;
-  const averageClickAccuracy = clickAccuracies.length > 0
-    ? (clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length * 100).toFixed(2)
-    : 'N/A';
+  const averageClickAccuracy = clickAccuracies.length > 0 ? (clickAccuracies.reduce((a, b) => a + b, 0) / clickAccuracies.length * 100).toFixed(2) : 'N/A';
 
   return (
     <div className="challenge-page-wrapper">
-      {/* HUD code */}
       <div className="challenge-hud-area">
         {gameState === 'InProgress' && (
           <div className="game-hud">
-            <div className="hud-item">Time: {formatTime(timeRemaining)}</div>
-            <div className="hud-item">Score: {score}</div>
-            <div className="hud-item">NTPM: {ntpm}</div>
+            <div>Time: {formatTime(timeRemaining)}</div>
+            <div>Score: {score}</div>
+            <div>NTPM: {ntpm}</div>
           </div>
         )}
       </div>
 
       <div className="challenge-canvas-area">
-        <div className="game-canvas" onClick={onGameAreaClick}>
-          {/* Start Overlay */}
+        <div className="game-canvas" onMouseDown={onGameAreaMouseDown}>
           {gameState === 'NotStarted' && (
             <div className="game-overlay">
               <h1>Reaction Time Challenge</h1>
@@ -173,7 +196,38 @@ const ReactionTimePage: React.FC = () => {
                   <ReactionTimeStatCard attempts={userAttempts} />
                 </div>
               )}
-              <p>Click as many targets as you can in {TOTAL_TIME} seconds.</p>
+
+              <div className="game-settings">
+                <div className="setting-row">
+                  <label htmlFor="advanced-toggle">Advanced Mode</label>
+                  <label className="theme-toggle" title="Toggle Advanced Mode">
+                    <input
+                      type="checkbox"
+                      id="advanced-toggle"
+                      checked={isAdvancedMode}
+                      onChange={() => setGameSettings({ isAdvanced: !isAdvancedMode })}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+                {isAdvancedMode && (
+                  <div className="setting-row">
+                    <label>Target Speed</label>
+                    <div className="speed-selector">
+                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Normal' })}>Normal</button>
+                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Medium' })}>Medium</button>
+                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Fast' })}>Fast</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <p>
+                {isAdvancedMode
+                  ? "Targets will move and bounce off the walls. Score is multiplied by speed!"
+                  : `Click as many targets as you can in ${TOTAL_TIME} seconds.`
+                }
+              </p>
               <p>Points are awarded based on how close you click to the center.</p>
               <button onClick={startGameHandler} className="cta-button">
                 Start Game
@@ -181,7 +235,7 @@ const ReactionTimePage: React.FC = () => {
             </div>
           )}
 
-          {/* Finish Overlay */}
+          {/* --- No changes to Finished Overlay or Target Rendering --- */}
           {gameState === 'Finished' && (
             <div className="game-overlay">
               <h1>Time's Up!</h1>
@@ -191,11 +245,36 @@ const ReactionTimePage: React.FC = () => {
               <p>Net Targets Per Minute (NTPM): {ntpm}</p>
               <p>Average Click Accuracy to Center: {averageClickAccuracy}%</p>
               {isAuthenticated ? <p>Your score has been saved.</p> : <p>Login to save your scores!</p>}
+
+              <div className="game-settings">
+                <div className="setting-row">
+                  <label htmlFor="advanced-toggle">Advanced Mode</label>
+                  <label className="theme-toggle" title="Toggle Advanced Mode">
+                    <input
+                      type="checkbox"
+                      id="advanced-toggle"
+                      checked={isAdvancedMode}
+                      onChange={() => setGameSettings({ isAdvanced: !isAdvancedMode })}
+                    />
+                    <span className="slider"></span>
+                  </label>
+                </div>
+                {isAdvancedMode && (
+                  <div className="setting-row">
+                    <label>Target Speed</label>
+                    <div className="speed-selector">
+                      <button className={speed === 'Normal' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Normal' })}>Normal</button>
+                      <button className={speed === 'Medium' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Medium' })}>Medium</button>
+                      <button className={speed === 'Fast' ? 'active' : ''} onClick={() => setGameSettings({ speed: 'Fast' })}>Fast</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <button onClick={startGameHandler} className="cta-button">Play Again</button>
             </div>
           )}
 
-          {/* Render Interactive Targets */}
           {gameState === 'InProgress' && targets.map(target => (
             <InteractiveTarget
               key={target.id}
@@ -203,11 +282,10 @@ const ReactionTimePage: React.FC = () => {
               x={target.x}
               y={target.y}
               size={target.size}
-              onClick={onTargetClick}
+              onMouseDown={onTargetMouseDown}
             />
           ))}
 
-          {/* Render Floating Scores */}
           {floatingTexts.map(ft => (
             <div
               key={ft.id}
