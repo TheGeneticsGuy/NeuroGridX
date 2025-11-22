@@ -1,6 +1,7 @@
 import React from 'react';
 import StatCard from './StatCard';
-import { challenges, type Attempt } from '../../config/challenges.config';
+import { challenges } from '../../config/challenges.config';
+import { type Attempt } from '../../types/challenge.types'
 import './UserStats.css';
 
 interface UserStatsProps {

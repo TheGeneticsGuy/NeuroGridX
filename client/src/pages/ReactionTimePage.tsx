@@ -4,7 +4,7 @@ import { useGameStore } from '../store/game.store';
 import axios from 'axios';
 import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTimeStatCard';
 import InteractiveTarget from '../components/game/InteractiveTarget';
-import { type Attempt } from '../config/challenges.config';
+import { type Attempt } from '../types/challenge.types';
 import './ReactionTimePage.css';
 import { useUIStore } from '../store/ui.store';
 

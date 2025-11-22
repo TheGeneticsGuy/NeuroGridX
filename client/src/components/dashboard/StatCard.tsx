@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { type ChallengeConfig, type Attempt } from '../../config/challenges.config';
+import { type ChallengeConfig, type Attempt } from '../../types/challenge.types'
 import Tooltip from "../../components/tooltips/tooltips";
 import './UserStats.css';
 
