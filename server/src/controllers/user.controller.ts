@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Types } from 'mongoose'; // Had to import this to resolve TS's issue with not knowing mongoose types
 import User from '../models/user.model';
 import generateToken from '../utils/generateToken';
+import { AuthRequest } from '../middleware/auth.middleware';
 
 // @route   POST /api/users/register
 // @access  Public
@@ -58,5 +59,98 @@ export const loginUser = async (req: Request, res: Response) => {
     }
   } catch (error: any) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// @route   GET /api/users/profile
+// @access  Private
+export const getUserProfile = async (req: AuthRequest, res: Response) => {
+  // Note: The "USER" object is already attached to the request by the 'protect' middleware function
+  if (req.user) {
+    res.json({
+      _id: req.user._id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      email: req.user.email,
+      role: req.user.role,
+      bio: req.user.bio,
+      avatarUrl: req.user.avatarUrl,
+      phone: req.user.phone,
+      bciStatus: req.user.bciStatus || 'None',
+      bciCompany: req.user.bciCompany || '',
+      createdAt: req.user.createdAt,
+    });
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+};
+
+// @route   PUT /api/users/profile
+// @access  Private
+export const updateUserProfile = async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    // BCI Request Verification
+    if (!user.bciStatus) user.bciStatus = 'None';
+    const wasBciApplicant = user.bciStatus !== 'None'; // None is default status
+    const isNowBciApplicant = req.body.isBciApplicant === true; // Gettin flag from frontend
+
+    user.firstName = req.body.firstName || user.firstName;
+    user.lastName = req.body.lastName || user.lastName;
+    user.email = req.body.email || user.email;
+    user.bio = req.body.bio ?? user.bio; // Keeping optional like most profiles - STRETCH goal to build profile page that you can share.
+    user.phone = req.body.phone ?? user.phone;
+
+    if (isNowBciApplicant) {
+        const newCompany = req.body.bciCompany || 'Neuralink';
+
+        // Check if company changed
+        if (user.bciCompany !== newCompany) {
+            user.bciCompany = newCompany;
+            // If company changed, marking it modified
+            user.markModified('bciCompany');
+        }
+
+        if (user.bciStatus !== 'Verified') {
+            if (user.bciStatus !== 'Pending') {
+                user.bciStatus = 'Pending';
+                user.markModified('bciStatus'); // Forcing this to modified - Total QOL thing for me
+            }
+        }
+    } else {
+        // User is NOT requesting BCI status (unchecked box)
+        if (user.bciStatus !== 'Verified') {
+            if (user.bciStatus !== 'None') {
+                user.bciStatus = 'None';
+                user.markModified('bciStatus');
+            }
+            user.bciCompany = undefined;
+            user.markModified('bciCompany');
+        }
+    }
+
+    // Check if anything was actually modified - don't want to do unnecessary updates to MongoDB and waste my writes.
+    if (!user.isModified()) {
+        return res.status(200).json({ message: 'No changes were made to the profile.' });
+    }
+
+    const updatedUser = await user.save();
+    const justAppliedForBci = isNowBciApplicant && !wasBciApplicant;
+
+    res.json({
+      _id: updatedUser._id,
+      firstName: updatedUser.firstName,
+      lastName: updatedUser.lastName,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      bio: updatedUser.bio,
+      avatarUrl: updatedUser.avatarUrl,
+      token: generateToken((updatedUser._id as Types.ObjectId).toString(), updatedUser.role),
+      message: 'Profile updated successfully!', // Add a success message
+      bciStatusMessage: justAppliedForBci ? 'Your BCI status is now pending review by an administrator.' : null
+    });
+  } else {
+    res.status(404).json({ message: 'User not found' });
   }
 };

@@ -43,16 +43,38 @@ export interface IUser extends Document {
   password?: string;
   googleId?: string;
   role: 'Standard' | 'BCI' | 'Admin';
+  bio?: string;
+  avatarUrl?: string;
+  phone?: string;
+  bciStatus: 'None' | 'Pending' | 'Verified' | 'Rejected';
+  bciCompany?: string;
+  createdAt: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const userSchema: Schema<IUser> = new Schema({
   email: { type: String, required: true, unique: true, match: /.+\@.+\..+/ },
-  firstName: { type: String, required: false },
-  lastName: { type: String, required: false },
   password: { type: String, required: false },
   googleId: { type: String, required: false },
-  role: { type: String, required: true, enum: ['Standard', 'BCI', 'Admin'], default: 'Standard' },
+  firstName: { type: String, required: false },
+  lastName: { type: String, required: false },
+  role: {
+    type: String,
+    required: true,
+    enum: ['Standard', 'BCI', 'Admin'],
+    default: 'Standard'
+  },
+  bio: { type: String, required: false, maxlength: 300 },
+  avatarUrl: { type: String, required: false },
+  phone: { type: String, required: false },
+  bciStatus: {
+    type: String,
+    enum: ['None', 'Pending', 'Verified', 'Rejected'],
+    default: 'None'
+  },
+  bciCompany: { type: String, required: false },
+
+
 }, {
   timestamps: true
 });

@@ -30,6 +30,7 @@ const Header: React.FC = () => {
             {isAuthenticated ? (
               <> {/* Using a React Fragment */}
                 <Link to="/dashboard">Dashboard</Link>
+
                 <span className="user-info">Role: {user?.role}</span>   {/*TESTING ROLE - TODO: Remove */}
                 <button onClick={handleLogout} className="logout-button">
                   Logout

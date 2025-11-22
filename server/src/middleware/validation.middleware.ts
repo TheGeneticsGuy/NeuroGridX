@@ -42,3 +42,28 @@ export const validateLogin = [
         next();
     }
 ]
+
+// ProfilePage.tx forms for updating profile details
+export const validateProfileUpdate = [
+  body('firstName').optional().notEmpty().withMessage('First name cannot be empty.'),
+  body('lastName').optional().notEmpty().withMessage('Last name cannot be empty.'),
+  body('email').optional().isEmail().withMessage('Please include a valid email.'),
+  body('bio')
+    .optional()
+    .isLength({ max: 300 })
+    .withMessage('Bio cannot exceed 300 characters.'),
+  body('phone')
+    .optional({ values: 'falsy' }) // Allows empty string
+    // Allow common US formats: (123) 456-7890, 123-456-7890, 123.456.7890, 1234567890
+    .matches(/^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/)
+    .withMessage('Please enter a valid phone number (e.g., 123-456-7890).'),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map(err => err.msg);
+      return res.status(400).json({ messages: errorMessages });
+    }
+    next();
+  },
+];

@@ -1,0 +1,148 @@
+.profile-page-container {
+  width: 100%;
+}
+
+.profile-page-container h1 {
+  margin-bottom: 0.5rem;
+}
+
+.profile-page-container .member-since {
+  color: var(--color-text-secondary);
+  margin-bottom: 2rem;
+  font-style: italic;
+}
+
+.profile-form {
+  max-width: 700px;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.bci-application-section {
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bci-header {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bci-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.bci-checkbox-wrapper input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.bci-checkbox-wrapper label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.bci-notice {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.profile-form .form-button {
+  justify-self: start;
+  width: auto;
+  padding: 0.75rem 2rem;
+}
+
+.success-message, .no-changes-message {
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.success-message {
+  background-color: #27ae6033;
+  color: #2ecc71;
+  border: 1px solid #27ae60;
+}
+
+.no-changes-message {
+    background-color: #f39c1233;
+    color: #f1c40f;
+    border: 1px solid #f39c12;
+}
+
+/* Superhero powers verification */
+.form-text {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+}
+
+.status-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+}
+
+.status-banner .icon {
+  font-size: 1.5rem;
+}
+
+.status-banner strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.status-banner p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Verified */
+.status-banner.verified {
+  background-color: rgba(39, 174, 96, 0.2);
+  border-color: #27ae60;
+  color: #2ecc71;
+}
+
+/* Pending */
+.status-banner.pending {
+  background-color: rgba(241, 196, 15, 0.2);
+  border-color: #f39c12;
+  color: #f1c40f;
+}
+
+/* Rejected*/
+.status-banner.rejected {
+  background-color: rgba(231, 76, 60, 0.2);
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.status-banner.rejected a {
+  color: inherit;
+  text-decoration: underline;
+  font-weight: bold;
+}

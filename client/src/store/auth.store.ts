@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   setToken: (token: string) => void;
+  updateUser: (data: { token: string }) => void;
   logout: () => void;
 }
 
@@ -36,6 +37,18 @@ export const useAuthStore = create<AuthState>()(
           console.error("Failed to decode token:", error);
           // Clearing auth state if get corrupted token
           set({ token: null, user: null, isAuthenticated: false });
+        }
+      },
+      updateUser: (data) => {
+        try {
+            const decodedUser: User = jwtDecode(data.token);
+            set({
+                token: data.token,
+                user: decodedUser,
+                isAuthenticated: true,
+            });
+        } catch (error) {
+            console.error("Failed to decode token when updating user:", error);
         }
       },
       logout: () => {

@@ -1,0 +1,23 @@
+.mode-selector {
+  display: flex;
+  background-color: var(--color-background-mute);
+  border-radius: 8px;
+  padding: 0.5rem;
+  width: fit-content;
+}
+
+.mode-selector button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.mode-selector button.active {
+  background-color: var(--color-primary);
+  color: white;
+}
