@@ -180,7 +180,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     const rect = canvas.getBoundingClientRect();
     const canvasWidth = rect.width;
     const canvasHeight = rect.height;
-    const HUD_OFFSET_Y = 0; // Set to 0 since HUD is outside canvas
+    const HUD_OFFSET_Y = 0;
 
     const size = Math.random() * MAX_TARGET_SIZE + MIN_TARGET_SIZE;
     const radius = size / 2;
@@ -188,12 +188,14 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     const effectiveWidth = canvasWidth - size;
     const effectiveHeight = canvasHeight - size - HUD_OFFSET_Y;
 
-    let vx = 0, vy = 0;
+    let initVx = 0;
+    let initVy = 0;
+
     if (gameSettings.isAdvanced) {
       const speedValue = BASE_SPEED * (Object.keys(SPEED_MULTIPLIERS).indexOf(gameSettings.speed) + 1.5);
       const angle = Math.random() * 2 * Math.PI;
-      vx = Math.cos(angle) * speedValue;
-      vy = Math.sin(angle) * speedValue;
+      initVx = Math.cos(angle) * speedValue;
+      initVy = Math.sin(angle) * speedValue;
     }
 
     const newTarget: Target = {
@@ -201,8 +203,8 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
       x: Math.random() * effectiveWidth + radius,
       y: (Math.random() * effectiveHeight + radius) + HUD_OFFSET_Y,
       size: size,
-      vx,
-      vy,
+      vx: initVx,
+      vy: initVy,
     };
 
     set({ targets: [newTarget] });
@@ -217,29 +219,33 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     const rect = canvas.getBoundingClientRect();
 
     const updatedTargets = targets.map(target => {
-      let { x, y, vx, vy, size } = target;
-      const radius = size / 2;
+      let newX = target.x;
+      let newY = target.y;
+      let newVx = target.vx;
+      let newVy = target.vy;
+      const radius = target.size / 2;
 
-      x += vx;
-      y += vy;
+      newX += newVx;
+      newY += newVy;
 
-      if (x + radius >= rect.width) {
-        x = rect.width - radius;
-        vx = -vx;
-      } else if (x - radius <= 0) {
-        x = radius;
-        vx = -vx;
+      // Bounce off walls
+      if (newX + radius >= rect.width) {
+        newX = rect.width - radius;
+        newVx = -newVx;
+      } else if (newX - radius <= 0) {
+        newX = radius;
+        newVx = -newVx;
       }
 
-      if (y + radius >= rect.height) {
-        y = rect.height - radius;
-        vy = -vy;
-      } else if (y - radius <= 0) {
-        y = radius;
-        vy = -vy;
+      if (newY + radius >= rect.height) {
+        newY = rect.height - radius;
+        newVy = -newVy;
+      } else if (newY - radius <= 0) {
+        newY = radius;
+        newVy = -newVy;
       }
 
-      return { ...target, x, y, vx, vy };
+      return { ...target, x: newX, y: newY, vx: newVx, vy: newVy };
     });
 
     set({ targets: updatedTargets });
