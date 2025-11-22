@@ -7,7 +7,7 @@ import ModeSelector, { type StatMode } from '../components/dashboard/ModeSelecto
 import './DashboardPage.css';
 
 const DashboardOverviewPage: React.FC = () => {
-  const { user, token } = useAuthStore();
+  const { token } = useAuthStore();
   const [allAttempts, setAllAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
