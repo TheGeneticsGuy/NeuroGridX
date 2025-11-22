@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/auth.store';
 import UserStats from '../components/dashboard/UserStats';
-import { type Attempt } from '../config/challenges.config';
+import { type Attempt } from '../types/challenge.types';
 import ModeSelector, { type StatMode } from '../components/dashboard/ModeSelector';
 import './DashboardPage.css';
 

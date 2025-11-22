@@ -1,5 +1,5 @@
 import React from 'react';
-import { type StatCardProps } from '../../../config/challenges.config';
+import { type StatCardProps } from '../../../types/challenge.types';
 
 // This component only displays the Reaction Time Stats Challenge data.
 
