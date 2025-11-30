@@ -23,7 +23,6 @@ const RegisterPage: React.FC = () => {
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
-  const requiredFieldTitle = "This field is required.";
 
   useEffect(() => {
     if (isAuthenticated) {

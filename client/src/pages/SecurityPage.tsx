@@ -2,9 +2,8 @@ import React, { useState, type FormEvent } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/auth.store';
 import PasswordStrength from '../components/auth/PasswordStrength';
-import ValidationErrors from '../components/common/ValidationErrors';
 import '../styles/forms.css';
-import './SecurityPage.css'; // We'll create this
+import './SecurityPage.css';
 
 const SecurityPage: React.FC = () => {
   const { token, logout } = useAuthStore();
