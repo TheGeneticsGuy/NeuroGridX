@@ -113,3 +113,59 @@
 .password-toggle-btn:hover {
     color: var(--color-text-primary);
 }
+
+.bci-application-section {
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bci-header {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bci-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.bci-checkbox-wrapper input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.bci-checkbox-wrapper label {
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.bci-notice {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin-top: 0;
+  font-style: italic;
+}
+
+.form-text {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+}
