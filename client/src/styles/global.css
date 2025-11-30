@@ -17,6 +17,19 @@
   --color-logo: #fff;
   --color-nav-links: #ddd;
   --form-input-background: #3f3f3f;
+
+  /* BCI Verification coloring */
+  --color-status-success-bg: rgba(39, 174, 96, 0.2);
+  --color-status-success-border: #27ae60;
+  --color-status-success-text: #2ecc71;
+
+  --color-status-warning-bg: rgba(241, 196, 15, 0.2);
+  --color-status-warning-border: #f39c12;
+  --color-status-warning-text: #f1c40f;
+
+  --color-status-error-bg: rgba(231, 76, 60, 0.2);
+  --color-status-error-border: #e74c3c;
+  --color-status-error-text: #e74c3c;
 }
 
 /*Override default when the <html> element has the data-theme="light" attribute*/
@@ -34,6 +47,19 @@
   --color-logo: black;
   --color-nav-links: black;
   --form-input-background: #fff;
+
+  /* BCI Verification coloring */
+  --color-status-success-bg: rgba(39, 174, 96, 0.15);
+  --color-status-success-border: #27ae60;
+  --color-status-success-text: #1e8449;
+
+  --color-status-warning-bg: rgba(241, 196, 15, 0.15);
+  --color-status-warning-border: #d68910;
+  --color-status-warning-text: #9a6324;
+
+  --color-status-error-bg: rgba(231, 76, 60, 0.15);
+  --color-status-error-border: #e74c3c;
+  --color-status-error-text: #c0392b;
 }
 
 body {

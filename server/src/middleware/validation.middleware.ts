@@ -67,3 +67,29 @@ export const validateProfileUpdate = [
     next();
   },
 ];
+
+export const validatePasswordChange = [
+  body('currentPassword').notEmpty().withMessage('Current password is required.'),
+
+  // Reusing same rules from registration to keep it consistent
+  body('newPassword')
+    .isLength({ min: 8 })
+    .withMessage('New password must be at least 8 characters long.')
+    .matches(/\d/)
+    .withMessage('New password must contain a number.')
+    .matches(/[a-z]/)
+    .withMessage('New password must contain a lowercase letter.')
+    .matches(/[A-Z]/)
+    .withMessage('New password must contain an uppercase letter.')
+    .matches(/[!@#$%^&*(),.?":{}|<>]/)
+    .withMessage('New password must contain a special character.'),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const errorMessages = errors.array().map(err => err.msg);
+      return res.status(400).json({ message: errorMessages[0] }); // Returning first error as 'message' for the frontend
+    }
+    next();
+  },
+];

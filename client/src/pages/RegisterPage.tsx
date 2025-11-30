@@ -18,9 +18,12 @@ const RegisterPage: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
+  const [isBciApplicant, setIsBciApplicant] = useState(false);
+  const [bciCompany, setBciCompany] = useState('');
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
+  const requiredFieldTitle = "This field is required.";
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -32,12 +35,19 @@ const RegisterPage: React.FC = () => {
     e.preventDefault();
     setErrors([]); // Clear all previous errorss
 
+    if (isBciApplicant && !bciCompany.trim()) {
+        setErrors(['Please enter your BCI Provider Company name.']);
+        return;
+    }
+
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/users/register`, {
         email,
         password,
         firstName,
         lastName,
+        isBciApplicant,
+        bciCompany
       });
       setToken(response.data.token);
       navigate('/dashboard'); // Navigate to dashboard on successful registration
@@ -139,6 +149,43 @@ const RegisterPage: React.FC = () => {
           </div>
           <PasswordStrength password={password} />
         </div>
+
+        <div className="bci-application-section">
+            <h3 className="bci-header">🦸 Superhero Powers Verification</h3>
+
+            <div className="bci-checkbox-wrapper" onClick={() => setIsBciApplicant(!isBciApplicant)}>
+                <input
+                    id="bci-applicant"
+                    type="checkbox"
+                    checked={isBciApplicant}
+                    onChange={() => {}} // Controlled by wrapper click
+                />
+                <label htmlFor="bci-applicant">I am a Brain-Computer Interface recipient.</label>
+            </div>
+
+            {isBciApplicant && (
+                <>
+                    <p className="bci-notice">
+                        Please only select this if you have received a BCI implant.
+                        After submitting, your BCI status will be listed as "Pending" until an admin can verify.
+                    </p>
+                    <div className="form-group">
+                        <label htmlFor="bciCompany">BCI Provider Company *</label>
+                        <input
+                            id="bciCompany"
+                            type="text"
+                            className="form-input"
+                            value={bciCompany}
+                            onChange={(e) => setBciCompany(e.target.value)}
+                            placeholder="e.g., Neuralink"
+                            required // HTML validation
+                        />
+                        <small className="form-text">The name of the company that provided your implant.</small>
+                    </div>
+                </>
+            )}
+        </div>
+
         <button type="submit" className="form-button">Create Account</button>
       </form>
       <div className="form-divider"><span>OR</span></div>

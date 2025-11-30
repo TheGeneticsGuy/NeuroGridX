@@ -6,13 +6,14 @@ import { type Attempt } from '../types/challenge.types';
 import ModeSelector, { type StatMode } from '../components/dashboard/ModeSelector';
 import './DashboardPage.css';
 
+const ITEMS_PER_PAGE = 25
+
 const DashboardOverviewPage: React.FC = () => {
   const { token } = useAuthStore();
   const [allAttempts, setAllAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [statMode, setStatMode] = useState<StatMode>('Normal');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -36,12 +37,32 @@ const DashboardOverviewPage: React.FC = () => {
     fetchAttempts();
   }, [token]);
 
+  // Pagination logic
+  const [statMode, setStatMode] = useState<StatMode>('Normal');
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statMode]);
+
   const filteredAttempts = useMemo(() => {
     return allAttempts.filter(attempt => {
       const mode = attempt.settings?.mode || 'Normal';
       return mode === statMode;
     });
   }, [allAttempts, statMode]);
+
+  const totalPages = Math.ceil(filteredAttempts.length / ITEMS_PER_PAGE);
+  const displayedAttempts = filteredAttempts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(prev => prev - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(prev => prev + 1);
+  };
 
   return (
     // Note,The parent div is on the DashboardLayout component.
@@ -63,6 +84,7 @@ const DashboardOverviewPage: React.FC = () => {
           {filteredAttempts.length === 0 ? (
             <p className="no-attempts-message">No attempts found for {statMode} mode.</p>
           ) : (
+            <>
             <table className="attempts-table">
               <thead>
                 <tr>
@@ -75,18 +97,40 @@ const DashboardOverviewPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredAttempts.map((attempt) => (
-                  <tr key={attempt._id}>
+                {displayedAttempts.map((attempt) => (
+                <tr key={attempt._id}>
                     <td>{new Date(attempt.createdAt).toLocaleDateString()}</td>
                     <td>{attempt.challengeType}</td>
                     <td>{attempt.score.toLocaleString()}</td>
                     <td>{attempt.settings?.speed ?? 'N/A'}</td>
                     <td>{attempt.ntpm ?? 'N/A'}</td>
                     <td>{attempt.averageClickAccuracy ? `${(attempt.averageClickAccuracy * 100).toFixed(1)}%` : 'N/A'}</td>
-                  </tr>
+                </tr>
                 ))}
               </tbody>
             </table>
+              {totalPages > 1 && (
+                <div className="pagination-controls">
+                  <button
+                      onClick={handlePrevPage}
+                      disabled={currentPage === 1}
+                      className="pagination-btn"
+                  >
+                      Previous
+                  </button>
+                  <span className="page-info">
+                      Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                      onClick={handleNextPage}
+                      disabled={currentPage === totalPages}
+                      className="pagination-btn"
+                  >
+                      Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </>
       )}

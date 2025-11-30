@@ -7,7 +7,7 @@ import { AuthRequest } from '../middleware/auth.middleware';
 // @route   POST /api/users/register
 // @access  Public
 export const registerUser = async (req: Request, res: Response) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password, firstName, lastName, isBciApplicant, bciCompany  } = req.body;
 
   try {
     const userExists = await User.findOne({ email }); // No need to register if they already have!!
@@ -16,12 +16,23 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    // need to determine BCI status
+    let bciStatus = 'None';
+    let companyToSave = undefined;
+
+    if (isBciApplicant) {
+        bciStatus = 'Pending';
+        companyToSave = bciCompany || 'Neuralink'; // Default if somehow missed
+    }
+
     const user = await User.create({
       email,
       password,
       firstName,
       lastName,
       role: 'Standard',
+      bciStatus,        // 'None' or 'Pending' as above...
+      bciCompany: companyToSave,
     });
 
     if (user) {
@@ -29,6 +40,7 @@ export const registerUser = async (req: Request, res: Response) => {
         _id: user._id,
         email: user.email,
         role: user.role,
+        bciStatus: user.bciStatus,  // Immediate status which is nice.
         token: generateToken((user._id as Types.ObjectId).toString(), user.role),
       });
     } else {
@@ -153,4 +165,41 @@ export const updateUserProfile = async (req: AuthRequest, res: Response) => {
   } else {
     res.status(404).json({ message: 'User not found' });
   }
+
 };
+
+// @route   PUT /api/users/password
+  // @access  Private
+  export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      // Verify old p/w
+      const { currentPassword, newPassword } = req.body;
+      if (await user.matchPassword(currentPassword)) {
+        // Set new pw
+        user.password = newPassword;
+        await user.save();
+        res.json({ message: 'Password updated successfully' });
+      } else {
+        res.status(401).json({ message: 'Invalid current password' });
+      }
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  };
+
+  // @route   DELETE /api/users
+  // @access  Private
+  export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      //  For now, just doing a hard delete of the user, but eventually I should add something that deletes user from all collections
+
+      await user.deleteOne();
+      res.json({ message: 'User removed' });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  };

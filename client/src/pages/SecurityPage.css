@@ -1,0 +1,85 @@
+.security-page-container {
+  width: 100%;
+  max-width: 700px;
+}
+
+.security-section {
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.security-section h2 {
+  margin-top: 0;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.message-banner {
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+.message-banner.success {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+}
+.message-banner.error {
+  background-color: var(--color-status-error-bg);
+  color: var(--color-status-error-text);
+}
+
+.danger-zone {
+  border: 1px solid var(--color-status-error-border);
+  background-color: rgba(231, 76, 60, 0.05);
+}
+
+.danger-zone h2 {
+  color: var(--color-status-error-text);
+  border-color: var(--color-status-error-border);
+}
+
+.danger-button {
+  background-color: var(--color-status-error-border);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.danger-button:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+.danger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.delete-confirmation {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.delete-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--color-text-secondary);
+  color: var(--color-text-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+}

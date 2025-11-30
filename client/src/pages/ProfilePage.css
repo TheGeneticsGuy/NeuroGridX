@@ -146,3 +146,24 @@
   text-decoration: underline;
   font-weight: bold;
 }
+
+/* Verified Style */
+.status-banner.verified {
+  background-color: var(--color-status-success-bg);
+  border-color: var(--color-status-success-border);
+  color: var(--color-status-success-text);
+}
+
+/* Pending Style */
+.status-banner.pending {
+  background-color: var(--color-status-warning-bg);
+  border-color: var(--color-status-warning-border);
+  color: var(--color-status-warning-text);
+}
+
+/* Rejected Style */
+.status-banner.rejected {
+  background-color: var(--color-status-error-bg);
+  border-color: var(--color-status-error-border);
+  color: var(--color-status-error-text);
+}
