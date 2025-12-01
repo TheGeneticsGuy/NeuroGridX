@@ -10,7 +10,8 @@ const LineTracingPage: React.FC = () => {
 
   const {
     gameState, score, timeElapsed, progress, pathPoints, lineWidth,
-    generatePath, startGame, failGame, completeGame, updateProgress, resetGame
+    generatePath, startGame, failGame, completeGame, updateProgress, resetGame,
+    penalties, isOffPath, graceTimeRemaining, goOffPath, returnToPath
   } = useLineTracingStore();
 
   const { isAuthenticated, token } = useAuthStore();

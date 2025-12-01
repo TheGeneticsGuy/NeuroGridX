@@ -33,10 +33,6 @@ canvas {
     height: 100%;
 }
 
-.active-cursor {
-    cursor: none; /* Hide default cursor when playing */
-}
-
 .game-overlay {
     position: absolute;
     top: 50%;
@@ -75,4 +71,18 @@ canvas {
     font-size: 0.9rem;
     font-weight: bold;
     z-index: 100;
+}
+
+.cursor-tooltip.warning {
+    background-color: rgba(255, 0, 0, 0.9);
+    color: white;
+    border: 2px solid white;
+    font-size: 1.1rem;
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
