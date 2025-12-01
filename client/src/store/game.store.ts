@@ -3,8 +3,6 @@ import { create } from 'zustand';
 // PENDING NOTES AND IDEAS:
 // PENALTYU - Determine better scoring mechanism... I initially removed 20 on a miss, but I am realizing that
 //              removing points is no fun. It should just reward total accomplished.
-// ADD An Advanced challenge mode where the object is moving around... and you can set it to 4 differnt speeds. Normal Med Fast Ultra Fast
-// Add horizontal and vertical lines with intersecting at the mouse cursor, with a % accuracy number over cursor on the click.
 
 const TOTAL_TIME = 60;
 const MAX_TARGET_SIZE = 120;

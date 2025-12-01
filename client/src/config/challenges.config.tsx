@@ -1,5 +1,5 @@
 import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTimeStatCard';
-// import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
+import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
 // import DragAndDropStatCard from '../components/dashboard/stat-cards/DragAndDropStatCard';
 import { type ChallengeConfig } from '../types/challenge.types';
 // FUTRE CHALLENGE IMPORTS //
@@ -18,13 +18,14 @@ export const challenges: ChallengeConfig[] = [
         key: 'line-tracing',
         name: 'Line Tracing',
         path: '/challenges/line-tracing',
-        StatCardComponent: ({ attempts: _}) => <div>Coming Soon!</div>, // TODO: Pending build
+        StatCardComponent: LineTraceStatCard,
         isEnabled: false,
     },
     {
         key: 'velocity-control',
         name: 'Velocity Control',
         path: '/challenges/velocity-control',
+        // StatCardComponent: DragAndDropStatCard,
         StatCardComponent: ({ attempts: _ }) => <div>Coming Soon!</div>,
         isEnabled: false,
     }

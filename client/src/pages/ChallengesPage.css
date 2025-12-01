@@ -2,3 +2,69 @@
     margin: 0 auto;
     text-align: center;
 }
+
+.challenges-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.challenges-page-container h1 {
+  margin-bottom: 3rem;
+  font-size: 2.5rem;
+  color: var(--color-text-primary);
+}
+
+.challenge-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  justify-content: center;
+}
+
+.challenge-card {
+  background-color: var(--color-background-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 2rem;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.challenge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  border-color: var(--color-primary);
+}
+
+[data-theme='light'] .challenge-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.challenge-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+  color: var(--color-primary);
+}
+
+.challenge-card p {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Optional: Add an icon or visual indicator container if you want later */
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+}

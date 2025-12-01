@@ -11,6 +11,7 @@ import DashboardLayout from './components/dashboard/DashboardLayout';
 import DashboardOverviewPage from './pages/DashboardOverviewPage';
 import ProfilePage from './pages/ProfilePage';
 import SecurityPage from './pages/SecurityPage';
+import LineTracingPage from './pages/LineTracingPage';
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/challenges" element={<ChallengesPage />} />
           <Route path="/challenges/reaction-time" element={<ReactionTimePage />} />
+          <Route path="/challenges/line-tracing" element={<LineTracingPage />} />
 
           {/* Protected Routes */}
           <Route path="/dashboard" element={<ProtectedRoute />}>
