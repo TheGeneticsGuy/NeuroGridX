@@ -7,6 +7,7 @@ import './LineTracingPage.css';
 const LineTracingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const hasInitialPathGenerated = useRef(false);
 
   const {
     gameState, score, timeElapsed, progress, pathPoints, lineWidth,
@@ -29,14 +30,15 @@ const LineTracingPage: React.FC = () => {
 
   // Wait for container size before building path
   useEffect(() => {
-    if (gameState === 'NotStarted' && containerRef.current) {
+    if (!hasInitialPathGenerated.current && containerRef.current) {
         setTimeout(() => {
             if(containerRef.current) {
                 generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
+                hasInitialPathGenerated.current = true; // Mark as done - PREVENTS RACE CONDITION
             }
         }, 100);
     }
-  }, [gameState, generatePath]);
+  }, [generatePath]); // Remove gameState dependency
 
   // CANVAS DRAWING
   useEffect(() => {
