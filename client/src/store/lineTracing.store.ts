@@ -14,6 +14,7 @@ export interface Point {
 }
 
 const AUTOFAILTIME = 120;
+const BASE_WIDTH = 50; // in pixels
 
 interface LineTracingStore {
   gameState: GameState;
@@ -33,6 +34,8 @@ interface LineTracingStore {
   completeGame: () => void;
   updateProgress: (percent: number) => void;
   resetGame: () => void;
+  goOffPath: () => void;
+  returnToPath: () => void;
 
   _timerInterval: number | null;
 }
@@ -43,7 +46,7 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
   timeElapsed: 0,
   progress: 0,
   pathPoints: [],
-  lineWidth: 40, // Width of the path in pixels
+  lineWidth: BASE_WIDTH, // Width of the path in pixels
   _timerInterval: null,
   penalties: 0,
   isOffPath: false,
@@ -112,30 +115,32 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
 
       set({ timeElapsed: elapsed, graceTimeRemaining: newGraceTime });
 
-      // Auto-fail (2 mins)
-      if (elapsed >= 120) { /* ... fail ... */ }
+      // Auto-fail
+      if (elapsed >= AUTOFAILTIME) {
+        get().failGame();
+      }
     }, 100);
 
     set({ _timerInterval: interval });
   },
 
-   goOffPath: () => {
-      const { isOffPath, penalties } = get();
-      // CRITICAL - It was counting penalty returning to path. Only count if going from the path to off
-      if (!isOffPath) {
-          set({
-              isOffPath: true,
-              penalties: penalties + 1 // Increment penalty count
-          });
-      }
+  goOffPath: () => {
+    const { isOffPath, penalties } = get();
+    // CRITICAL - It was counting penalty returning to path. Only count if going from the path to off
+    if (!isOffPath) {
+        set({
+            isOffPath: true,
+            penalties: penalties + 1 // Increment penalty count
+        });
+    }
   },
 
   // Need to reset the grace time and set the off path back to false
   returnToPath: () => {
-      const { isOffPath } = get();
-      if (isOffPath) {
-          set({ isOffPath: false, graceTimeRemaining: 2.0 });
-      }
+    const { isOffPath } = get();
+    if (isOffPath) {
+        set({ isOffPath: false, graceTimeRemaining: 2.0 });
+    }
   },
 
   updateProgress: (newProgress) => {
@@ -153,7 +158,7 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
     const { timeElapsed, penalties } = get();
     // Base score 1000.
     // Maybe bonus? = (AUTOFAILTIME - timeElapsed) * 10. Faster time = way more points.
-    let score = Math.round(1000 + ((120 - timeElapsed) * 50));
+    let score = Math.round(1000 + ((AUTOFAILTIME - timeElapsed) * 50));
     score -= (penalties * 500);
     score = Math.max(0, score); // Negative Scores are no fun so setting to zero
 

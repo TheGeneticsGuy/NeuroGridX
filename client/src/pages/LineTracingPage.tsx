@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
-import { useLineTracingStore, type Point } from '../store/lineTracing.store';
+import { useLineTracingStore } from '../store/lineTracing.store';
 import axios from 'axios';
 import './LineTracingPage.css';
 
@@ -10,24 +10,26 @@ const LineTracingPage: React.FC = () => {
 
   const {
     gameState, score, timeElapsed, progress, pathPoints, lineWidth,
-    generatePath, startGame, failGame, completeGame, updateProgress, resetGame,
-    penalties, isOffPath, graceTimeRemaining, goOffPath, returnToPath
+    penalties, isOffPath, graceTimeRemaining,
+    generatePath, startGame, completeGame, updateProgress,
+    resetGame, goOffPath, returnToPath
   } = useLineTracingStore();
 
   const { isAuthenticated, token } = useAuthStore();
 
-  // Cursor follower tooltip - track state
+  // Cursor tooltip to track the state
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
+  const [isOverStartZone, setIsOverStartZone] = useState(false);
+  const [isPreviewing, setIsPreviewing] = useState(false);
 
   // Cleanup
   useEffect(() => {
     return () => resetGame();
   }, [resetGame]);
 
-  // Initial Path Generation (need to wait for container size or else this doesn't work right)
+  // Wait for container size before building path
   useEffect(() => {
     if (gameState === 'NotStarted' && containerRef.current) {
-        // slight timeout to ensure layout is done
         setTimeout(() => {
             if(containerRef.current) {
                 generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
@@ -36,7 +38,7 @@ const LineTracingPage: React.FC = () => {
     }
   }, [gameState, generatePath]);
 
-  // Ok, the path drawing logic...
+  // CANVAS DRAWING
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || pathPoints.length < 2) return;
@@ -47,43 +49,26 @@ const LineTracingPage: React.FC = () => {
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
 
-    // Clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Drawing the "track"
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = '#333';
-
-    // Helper to draw the curve
     const drawCurve = () => {
         ctx.beginPath();
         ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
-        // Spline logic for smooth curve through points
         for (let i = 0; i < pathPoints.length - 1; i++) {
-            const p0 = i > 0 ? pathPoints[i - 1] : pathPoints[0];
             const p1 = pathPoints[i];
             const p2 = pathPoints[i + 1];
-            const p3 = i != pathPoints.length - 2 ? pathPoints[i + 2] : p2;
-
-            // Simple Bezier approximation for smoothing between points
-            // Note: For a true path trace, we often use Quadratic curves between midpoints
             const midX = (p1.x + p2.x) / 2;
             const midY = (p1.y + p2.y) / 2;
-
-            if (i === 0) {
-                 ctx.lineTo(midX, midY); // Start line
-            } else if (i === pathPoints.length - 2) {
-                 ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
-            } else {
-                 ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
-            }
+            if (i === 0) ctx.lineTo(midX, midY);
+            else if (i === pathPoints.length - 2) ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
+            else ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
         }
         ctx.stroke();
     };
 
-    // Draw "Border" of path first (slightly wider)
+    // Draw Border
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth + 4;
     ctx.strokeStyle = '#555';
     drawCurve();
@@ -93,7 +78,6 @@ const LineTracingPage: React.FC = () => {
     ctx.strokeStyle = '#222';
     drawCurve();
 
-    // Draw Start and End Zones
     const start = pathPoints[0];
     const end = pathPoints[pathPoints.length - 1];
 
@@ -106,7 +90,7 @@ const LineTracingPage: React.FC = () => {
     ctx.font = 'bold 16px sans-serif';
     ctx.fillText('START', start.x - 25, start.y + 5);
 
-    // End Zone (Finish Line)
+    // End Zone
     ctx.beginPath();
     ctx.arc(end.x, end.y, lineWidth, 0, Math.PI * 2);
     ctx.fillStyle = '#27ae60';
@@ -114,27 +98,39 @@ const LineTracingPage: React.FC = () => {
     ctx.fillStyle = 'white';
     ctx.fillText('FINISH', end.x - 25, end.y + 5);
 
-  }, [pathPoints, lineWidth]);
+  }, [pathPoints, lineWidth, gameState]); // Redraw on state change just in case
 
 
-  // Collison logic - NEED TO USE HTMLCANVAS
+  // MOUSE MOVEMENT
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas || gameState !== 'InProgress') return;
+    if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    // Update cursor tooltip pos
     setCursorPos({ x: e.clientX, y: e.clientY });
+
+    // "Not Started" Hover
+    if (gameState === 'NotStarted' && pathPoints.length > 0) {
+        const start = pathPoints[0];
+        const distStart = Math.sqrt(Math.pow(x - start.x, 2) + Math.pow(y - start.y, 2));
+        if (distStart <= lineWidth) {
+            setIsOverStartZone(true);
+        } else {
+            setIsOverStartZone(false);
+        }
+        return;
+    }
+
+    // Game Logic
+    if (gameState !== 'InProgress') return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Note: To make this robust, I should cache the Path2D object... eventually
-
-    // Re-define the path
+    // Re-trace path for collision detection
     ctx.beginPath();
     ctx.moveTo(pathPoints[0].x, pathPoints[0].y);
     for (let i = 0; i < pathPoints.length - 1; i++) {
@@ -146,45 +142,52 @@ const LineTracingPage: React.FC = () => {
         else if (i === pathPoints.length - 2) ctx.quadraticCurveTo(p1.x, p1.y, p2.x, p2.y);
         else ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
     }
-
-    // CRITICAL: Same line width for detection
     ctx.lineWidth = lineWidth;
 
-    // Check if user is ON the line
+    // Check wall Collision
     if (ctx.isPointInStroke(x, y) || ctx.isPointInPath(x,y)) {
+        returnToPath();
+
+        // Check Win Condition
         const end = pathPoints[pathPoints.length - 1];
         const distEnd = Math.sqrt(Math.pow(x - end.x, 2) + Math.pow(y - end.y, 2));
-
         if (distEnd <= lineWidth) {
             completeGame();
             return;
         }
 
-        // Calculate rough progress based on X position relative to width
+        // Calculate Progress
         const totalDist = pathPoints[pathPoints.length-1].x - pathPoints[0].x;
         const currentDist = x - pathPoints[0].x;
         const pct = Math.max(0, Math.min(100, (currentDist / totalDist) * 100));
         updateProgress(pct);
 
     } else {
-        // User went OFF the line!
-        // Allow a small grace period or distance maybe?? Strict mode for now...
-        // maybe if you hit the wall, you have 1 second to come back, but negative points?
-
-        // However, check if they are in the Start zone
+        // User is OFF path
+        // Check if they are still in the start zone (safe)
         const start = pathPoints[0];
         const distStart = Math.sqrt(Math.pow(x - start.x, 2) + Math.pow(y - start.y, 2));
 
         if (distStart > lineWidth) {
-             failGame();
+             goOffPath();
         }
     }
   };
 
-  const handleStartGame = () => {
-    // I need to add a start trigger where the mouse crosses the left side of the start... not a start button
-    // So, instead of start game, maybe build path
-    startGame();
+  // CLICK TO START LOGIC
+  const handleCanvasClick = () => {
+      if (gameState === 'NotStarted' && isOverStartZone) {
+          startGame();
+          setIsOverStartZone(false);
+      }
+  };
+
+  // Generate New Path Button
+  const handleGeneratePath = () => {
+    if(containerRef.current) {
+        generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
+        setIsPreviewing(true); // Hiding the overlay
+    }
   };
 
   // Save Score Effect
@@ -196,20 +199,24 @@ const LineTracingPage: React.FC = () => {
                     challengeType: 'Line Tracing',
                     score: score,
                     completionTime: timeElapsed,
-                    accuracy: progress / 100, // 0 to 1
-                    settings: { mode: 'Normal' } // No advanced mode yet
+                    accuracy: progress / 100,
+                    ntpm: penalties, // Storing penalties in ntpm field (for now)
+                    settings: { mode: 'Normal' }
                 }, { headers: { Authorization: `Bearer ${token}` } });
+                console.log("Line Tracing Score Saved");
             } catch(e) { console.error(e); }
         }
     };
     save();
-  }, [gameState]);
+  }, [gameState, isAuthenticated, token, score, timeElapsed, progress, penalties]);
 
   return (
     <div className="line-tracing-wrapper">
-        {/* HUD */}
         <div className="tracing-hud">
             <div>Time: {timeElapsed.toFixed(1)}s</div>
+            <div style={{color: penalties > 0 ? '#ff6b6b' : 'inherit'}}>
+                Penalties: {penalties}
+            </div>
             <div>Progress: {progress.toFixed(1)}%</div>
         </div>
 
@@ -217,18 +224,40 @@ const LineTracingPage: React.FC = () => {
             <canvas
                 ref={canvasRef}
                 onMouseMove={handleMouseMove}
-                className={gameState === 'InProgress' ? 'active-cursor' : ''}
+                onClick={handleCanvasClick}
+                className={
+                    gameState === 'InProgress' ? 'active-cursor' :
+                    (gameState === 'NotStarted' && isOverStartZone) ? 'pointer-cursor' : ''
+                }
             />
 
-            {/* Overlays */}
-            {gameState === 'NotStarted' && (
+            {/* Start Overlay */}
+            {gameState === 'NotStarted' && !isPreviewing && (
                 <div className="game-overlay">
                     <h1>Line Tracing</h1>
                     <p>Trace the line from Start to Finish. Don't go outside the path!</p>
-                    <button onClick={handleStartGame} className="cta-button">Start Challenge</button>
+                    <p style={{color: '#8187ff', fontWeight: 'bold', marginTop: '1rem'}}>
+                        Click the START CIRCLE to begin.
+                    </p>
+                    <button onClick={handleGeneratePath} className="cta-button secondary">
+                        Generate New Path
+                    </button>
                 </div>
             )}
 
+             {/* Adding a small 'Back to Menu' button just in case someone doesn't like the path. */}
+            {gameState === 'NotStarted' && isPreviewing && (
+                 <div style={{position: 'absolute', top: 20, right: 20, zIndex: 30}}>
+                    <button onClick={() => setIsPreviewing(false)} className="cta-button secondary" style={{fontSize: '0.8rem', padding: '0.5rem 1rem'}}>
+                        Show Instructions
+                    </button>
+                    <button onClick={handleGeneratePath} className="cta-button" style={{fontSize: '0.8rem', padding: '0.5rem 1rem', marginLeft: '1rem'}}>
+                        New Path
+                    </button>
+                 </div>
+            )}
+
+            {/* Failure Overlay */}
             {gameState === 'Failed' && (
                 <div className="game-overlay">
                     <h1 style={{color: '#ff6b6b'}}>Failed!</h1>
@@ -237,31 +266,59 @@ const LineTracingPage: React.FC = () => {
                     <div className="button-group">
                         <button onClick={() => {
                             resetGame();
-                            generatePath(canvasRef.current!.width, canvasRef.current!.height, pathPoints);
+                            if(containerRef.current) generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight, pathPoints);
                         }} className="cta-button">Retry Path</button>
                         <button onClick={() => {
                             resetGame();
-                            generatePath(canvasRef.current!.width, canvasRef.current!.height);
+                            if(containerRef.current) generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
                         }} className="cta-button secondary">New Path</button>
                     </div>
                 </div>
             )}
 
+            {/* Success Overlay */}
             {gameState === 'Finished' && (
                 <div className="game-overlay">
                     <h1 style={{color: '#2ecc71'}}>Success!</h1>
                     <p>Time: {timeElapsed.toFixed(2)}s</p>
+                    <p>Penalties: {penalties}</p>
                     <p>Score: {score}</p>
-                    <button onClick={() => {
-                         resetGame();
-                         generatePath(canvasRef.current!.width, canvasRef.current!.height);
-                    }} className="cta-button">Next Challenge</button>
+                    <div className="button-group">
+                        <button onClick={() => {
+                            resetGame();
+                            if(containerRef.current) generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight, pathPoints);
+                        }} className="cta-button">Retry Path</button>
+                        <button onClick={() => {
+                            resetGame();
+                            if(containerRef.current) generatePath(containerRef.current.offsetWidth, containerRef.current.offsetHeight);
+                        }} className="cta-button secondary">New Path</button>
+                    </div>
                 </div>
             )}
         </div>
 
-        {/* Cursor Tooltip */}
-        {gameState === 'InProgress' && (
+        {/* Tooltip for Start Zone */}
+        {gameState === 'NotStarted' && isOverStartZone && (
+             <div
+                className="cursor-tooltip start-hint"
+                style={{ left: cursorPos.x + 15, top: cursorPos.y + 15 }}
+            >
+                Click to Start!
+            </div>
+        )}
+
+        {/* Warning Tooltip (Grace Period) */}
+        {gameState === 'InProgress' && isOffPath && (
+            <div
+                className="cursor-tooltip warning"
+                style={{ left: cursorPos.x + 15, top: cursorPos.y + 15 }}
+            >
+                RETURN TO PATH! {graceTimeRemaining.toFixed(1)}s
+            </div>
+        )}
+
+        {/* Normal Progress Tooltip */}
+        {gameState === 'InProgress' && !isOffPath && (
             <div
                 className="cursor-tooltip"
                 style={{ left: cursorPos.x + 15, top: cursorPos.y + 15 }}

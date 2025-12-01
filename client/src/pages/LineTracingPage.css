@@ -81,6 +81,10 @@ canvas {
     animation: pulse 0.5s infinite;
 }
 
+.start-hint {
+    background-color: #646cff;
+}
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
