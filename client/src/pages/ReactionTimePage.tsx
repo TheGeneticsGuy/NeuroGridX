@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useAuthStore } from '../store/auth.store';
 import { useGameStore } from '../store/game.store';
 import axios from 'axios';
@@ -84,9 +84,13 @@ const ReactionTimePage: React.FC = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("Score saved successfully!");
-        } catch (error) {
-          console.error("Failed to save score:", error); // just debugging
+        } catch (error: any) {
+          console.error("Failed to save score:", error);
+        if (error.response) {
+          // More detailed as this was failing
+          console.error("Server Error Details:", error.response.data);
         }
+      }
       }
     };
 
@@ -94,6 +98,15 @@ const ReactionTimePage: React.FC = () => {
       saveScore();
     }
   }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies, gameSettings]);
+
+  // Need to filter advanced vs normal mode on the stats
+  const filteredAttempts = useMemo(() => {
+    return userAttempts.filter(attempt => {
+      const attemptMode = attempt.settings?.mode || 'Normal';
+      const targetMode = isAdvancedMode ? 'Advanced' : 'Normal';
+      return attemptMode === targetMode;
+    });
+  }, [userAttempts, isAdvancedMode]);
 
   // For the miss text
   const onGameAreaMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -103,8 +116,8 @@ const ReactionTimePage: React.FC = () => {
     const { gameSettings } = useGameStore.getState();
     const speedMultipliers = { Normal: 1.33, Medium: 1.66, Fast: 2.0 };
     const speedMultiplier = gameSettings.isAdvanced ? speedMultipliers[gameSettings.speed] : 1;
-
-    const MISS_PENALTY = Math.round(25 * speedMultiplier); // The negative points are also worse when faster. Upping the challenge!
+    const MISS_PENALTY = Math.round(25 * speedMultiplier);              // The negative points are also worse when faster. Upping the challenge!
+    const isMercySkip = useGameStore.getState().consecutiveMisses >= 4; // Check for 4 becakse this click will be the 5th
 
     const penaltyText: FloatingText = {
       id: Date.now(),
@@ -119,6 +132,21 @@ const ReactionTimePage: React.FC = () => {
     setTimeout(() => {
       setFloatingTexts(prev => prev.filter(ft => ft.id !== penaltyText.id));
     }, 800);
+
+    if (isMercySkip) {
+        // Mercy text!!
+        const mercyText: FloatingText = {
+            id: Date.now() + 10,
+            x: e.clientX,
+            y: e.clientY - 30,
+            text: "SKIP!",
+            className: "bonus",
+        };
+        setFloatingTexts(prev => [...prev, mercyText]);
+        setTimeout(() => {
+            setFloatingTexts(prev => prev.filter(ft => ft.id !== mercyText.id));
+        }, 1000);
+    }
 
     handleMiss();
   };
@@ -141,7 +169,7 @@ const ReactionTimePage: React.FC = () => {
     // Calculate base points with multiplier
     const points = Math.round(Math.max(MIN_POINTS, linearPoints) * speedMultiplier);
 
-    const BONUS_THRESHOLD = 0.85;
+    const BONUS_THRESHOLD = 0.75;
     // Calculate bonus points with multiplier
     const BONUS_POINTS = Math.round(50 * speedMultiplier);
 
@@ -192,8 +220,8 @@ const ReactionTimePage: React.FC = () => {
               <h1>Reaction Time Challenge</h1>
               {isAuthenticated && !loadingStats && userAttempts.length > 0 && (
                 <div className="stat-card-inline">
-                  <h3>Your Stats</h3>
-                  <ReactionTimeStatCard attempts={userAttempts} />
+                  <h3>Your Stats ({isAdvancedMode ? 'Advanced' : 'Normal'})</h3>
+                  <ReactionTimeStatCard attempts={filteredAttempts} />
                 </div>
               )}
 

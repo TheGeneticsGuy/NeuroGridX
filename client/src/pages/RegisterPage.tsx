@@ -20,6 +20,8 @@ const RegisterPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isBciApplicant, setIsBciApplicant] = useState(false);
   const [bciCompany, setBciCompany] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const navigate = useNavigate();
   const { setToken, isAuthenticated } = useAuthStore();
@@ -33,6 +35,11 @@ const RegisterPage: React.FC = () => {
   const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
     setErrors([]); // Clear all previous errorss
+
+    if (password !== confirmPassword) {
+      setErrors(['Passwords do not match.']);
+      return;
+    }
 
     if (isBciApplicant && !bciCompany.trim()) {
         setErrors(['Please enter your BCI Provider Company name.']);
@@ -147,6 +154,29 @@ const RegisterPage: React.FC = () => {
             </button>
           </div>
           <PasswordStrength password={password} />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <div className="password-wrapper">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
+              className="form-input"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              aria-label="Confirm Password"
+            />
+            <button
+              type="button"
+              className="password-toggle-btn"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+            >
+              {showConfirmPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+            </button>
+          </div>
         </div>
 
         <div className="bci-application-section">

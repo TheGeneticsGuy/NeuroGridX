@@ -41,6 +41,7 @@ interface GameStateStore {
   targets: Target[];
   clickAccuracies: number[];
   gameSettings: GameSettings;
+  consecutiveMisses: number;
 
   startGame: (settings: GameSettings) => void;
   handleHit: (clickX: number, clickY: number, targetElement: HTMLDivElement) => void;
@@ -54,7 +55,7 @@ interface GameStateStore {
 }
 
 const SPEED_MULTIPLIERS = { Normal: 1.33, Medium: 1.66, Fast: 2.0 }; // I think I'll match the scoring to the speed, so 1.33x points for speed?
-const BASE_SPEED = 2;
+const BASE_SPEED = 0.5;
 
 export const useGameStore = create<GameStateStore>((set, get) => ({
   gameState: GameState.NotStarted,
@@ -67,6 +68,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
   gameSettings: { isAdvanced: false, speed: 'Normal' },
   _timerInterval: null,
   _animationFrameId: null,
+  consecutiveMisses: 0,
 
   startGame: (settings) => {
     if (get()._timerInterval) clearInterval(get()._timerInterval!);
@@ -80,6 +82,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
       timeRemaining: TOTAL_TIME,
       clickAccuracies: [],
       gameSettings: settings,
+      consecutiveMisses: 0,
     });
 
     get()._generateTarget();
@@ -116,7 +119,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     const MAX_POINTS = 100;
     const MIN_POINTS_ON_HIT = 25;
     const BONUS_ON_ACCURACY = 50;
-    const PERCENT_MIN_BONUS = 0.85;
+    const PERCENT_MIN_BONUS = 0.75;
 
     if (distance <= radius) {
       clickAccuracy = 1 - (distance / radius);
@@ -134,6 +137,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
         hits: state.hits + 1,
         score: state.score + pointsEarned,
         clickAccuracies: [...state.clickAccuracies, clickAccuracy],
+        consecutiveMisses: 0,
       }));
 
       get()._generateTarget();
@@ -143,14 +147,23 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
   handleMiss: () => {
     if (get().gameState !== GameState.InProgress) return;
 
-    const { gameSettings } = get();
-    const speedMultiplier = gameSettings.isAdvanced ? SPEED_MULTIPLIERS[gameSettings.speed] : 1;
-    const MISS_PENALTY = Math.round(25 * speedMultiplier);
+    const MISS_PENALTY = 25;
+    const MAX_CONSECUTIVE_MISSES = 5;
+    const currentMisses = get().consecutiveMisses + 1;
 
-    set((state) => ({
-      misses: state.misses + 1,
-      score: state.score - MISS_PENALTY,
-    }));
+    const stateUpdate: Partial<GameStateStore> = {
+      misses: get().misses + 1,
+      score: get().score - MISS_PENALTY,
+      consecutiveMisses: currentMisses,
+    };
+
+    // MERCY RULE!!! 5 misses in a row, generate new target!
+    if (currentMisses >= MAX_CONSECUTIVE_MISSES) {
+      stateUpdate.consecutiveMisses = 0;
+      get()._generateTarget();
+    }
+
+    set(stateUpdate);
   },
 
   resetGame: () => {
