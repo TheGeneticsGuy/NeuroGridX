@@ -8,9 +8,10 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 
 interface ActivityChartProps {
   data: { _id: string; count: number }[];
+  title?: string; // Keeping optional as I might vary this
 }
 
-const ActivityChart: React.FC<ActivityChartProps> = ({ data }) => {
+const ActivityChart: React.FC<ActivityChartProps> = ({ data, title }) => {
   const chartData = {
     labels: data.map(d => d._id),
     datasets: [
@@ -27,7 +28,11 @@ const ActivityChart: React.FC<ActivityChartProps> = ({ data }) => {
     responsive: true,
     plugins: {
       legend: { position: 'top' as const },
-      title: { display: true, text: '30-Day Activity' },
+      title: {
+          display: true,
+          text: title || 'Activity Trend',
+          font: { size: 16 }
+      },
     },
   };
 

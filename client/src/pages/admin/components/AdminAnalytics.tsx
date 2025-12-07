@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useAuthStore } from '../../../store/auth.store';
 import ActivityChart from '../../../components/charts/ActivityChart';
 import PerformanceChart from '../../../components/charts/PerformanceChart';
+import Tooltip from '../../../components/tooltips/tooltips';
+import ConfirmationModal from '../../../components/common/ConfirmationModal';
 import '../AdminDashboardPage.css';
 
 // --- Types ---
@@ -28,14 +30,14 @@ const USERS_PER_PAGE = 25;
 const AdminAnalytics: React.FC = () => {
   const { token } = useAuthStore();
 
-  // --- View State ---
+  // View State
   const [viewMode, setViewMode] = useState<'global' | 'users' | 'user-detail'>('users'); // Default to users list
 
-  // --- Analytics State ---
+  // Analytics state
   const [timeRange, setTimeRange] = useState<string>('30');
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
 
-  // --- User Management State ---
+  // User Management state
   const [users, setUsers] = useState<User[]>([]);
   const [userLoading, setUserLoading] = useState(false);
   const [filter, setFilter] = useState<'all' | 'pending'>('all');
@@ -47,6 +49,20 @@ const AdminAnalytics: React.FC = () => {
   const [selectedUserAttempts, setSelectedUserAttempts] = useState<any[]>([]);
   const [globalRoleFilter, setGlobalRoleFilter] = useState<'all' | 'Standard' | 'BCI'>('all');
   const [userRoleFilter, setUserRoleFilter] = useState<'all' | 'Standard' | 'BCI' | 'Admin'>('all');
+
+  // Detail Controls
+  const [detailTimeRange, setDetailTimeRange] = useState<number | 'all'>('all');
+  const [detailChallenge, setDetailChallenge] = useState<string>('Reaction Time');
+  const [detailMode, setDetailMode] = useState<'Normal' | 'Advanced'>('Normal');
+
+  // The confirmation modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    title: string;
+    message: string;
+    type: 'success' | 'danger';
+    onConfirm: () => void;
+  } | null>(null);
 
   // --- Let's get the analytics now ---
   useEffect(() => {
@@ -99,6 +115,13 @@ const AdminAnalytics: React.FC = () => {
       }
   };
 
+  const filteredUserAttempts = useMemo(() => {
+      return selectedUserAttempts.filter(a =>
+          a.challengeType === detailChallenge &&
+          (a.settings?.mode || 'Normal') === detailMode
+      );
+  }, [selectedUserAttempts, detailChallenge, detailMode]);
+
   useEffect(() => {
     if (viewMode === 'users') {
         fetchUsers();
@@ -106,14 +129,27 @@ const AdminAnalytics: React.FC = () => {
   }, [token, viewMode]);
 
   // --- Need to handle status ---
-  const handleStatusUpdate = async (userId: string, newStatus: 'Verified' | 'Rejected') => {
-    if (!window.confirm(`Set user to ${newStatus}?`)) return;
+  const triggerStatusUpdate = (userId: string, newStatus: 'Verified' | 'Rejected') => {
+    const isReject = newStatus === 'Rejected';
+
+    setModalConfig({
+      title: isReject ? 'Reject BCI Request?' : 'Approve BCI Request?',
+      message: `Are you sure you want to set this user's BCI status to ${newStatus}? This will notify the user.`,
+      type: isReject ? 'danger' : 'success',
+      onConfirm: () => performStatusUpdate(userId, newStatus),
+    });
+    setModalOpen(true);
+  };
+
+  const performStatusUpdate = async (userId: string, newStatus: 'Verified' | 'Rejected') => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/admin/users/${userId}/bci-status`, { status: newStatus }, config);
       fetchUsers();
     } catch (error) {
-      alert("Update failed");
+      alert("Failed to update status"); // Simple alert for actual errors is fine, or use a toast
+    } finally {
+      setModalOpen(false); // Close modal
     }
   };
 
@@ -174,11 +210,15 @@ const AdminAnalytics: React.FC = () => {
                   </div>
               </div>
 
+
               {analyticsData ? (
                   <div className="charts-grid">
                       <div className="chart-card full-width">
                           <h3>Activity Trend</h3>
-                          <ActivityChart data={analyticsData.activityOverTime} />
+                          <ActivityChart
+                            data={analyticsData.activityOverTime}
+                            title={timeRange === 'all' ? 'All Activity' : `${timeRange}-Day Activity Trend`}
+                            />
                       </div>
                       <div className="chart-card">
                           <h3>Total Users</h3>
@@ -201,25 +241,48 @@ const AdminAnalytics: React.FC = () => {
 
       {/* User Detail View */}
       {viewMode === 'user-detail' && selectedUser && (
-          <div className="user-detail-view">
-              <button className="back-btn" onClick={() => setViewMode('users')}>← Back to User List</button>
+        <div className="user-detail-view">
+            <button className="back-btn" onClick={() => setViewMode('users')}>← Back to User List</button>
 
-              <div className="user-header">
-                  <h2>Stats for: {selectedUser.firstName} {selectedUser.lastName}</h2>
-                  <span className={`status-badge ${selectedUser.role.toLowerCase()}`}>{selectedUser.role}</span>
-              </div>
+            <div className="user-header">
+                <h2>Stats for: {selectedUser.firstName} {selectedUser.lastName}</h2>
+                <span className={`status-badge ${selectedUser.role.toLowerCase()}`}>{selectedUser.role}</span>
+            </div>
 
-              {/* Reuse the PerformanceChart! */}
-              <div className="chart-card full-width" style={{marginTop: '1rem'}}>
-                  <PerformanceChart
-                      attempts={selectedUserAttempts}
-                      challengeName="Reaction Time (All Modes)"
-                      days="all"
-                  />
-              </div>
+            <div className="analytics-controls-row" style={{marginTop: '1.5rem'}}>
+                <div className="range-selector">
+                    <label>Challenge:</label>
+                    <select value={detailChallenge} onChange={(e) => setDetailChallenge(e.target.value)}>
+                        <option value="Reaction Time">Reaction Time</option>
+                        <option value="Line Tracing">Line Tracing</option>
+                    </select>
+                </div>
+                <div className="range-selector">
+                    <label>Mode:</label>
+                    <select value={detailMode} onChange={(e) => setDetailMode(e.target.value as any)}>
+                        <option value="Normal">Normal</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+                <div className="range-selector">
+                    <label>Time Range:</label>
+                    <select value={detailTimeRange} onChange={(e) => setDetailTimeRange(e.target.value === 'all' ? 'all' : Number(e.target.value))}>
+                        <option value={7}>Last 7 Days</option>
+                        <option value={30}>Last 30 Days</option>
+                        <option value={90}>Last 90 Days</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+            </div>
 
-              {/* Add another chart for Line Tracing if desired */}
-          </div>
+            <div className="chart-card full-width">
+                <PerformanceChart
+                    attempts={filteredUserAttempts}
+                    challengeName={`${detailChallenge} (${detailMode})`}
+                    days={detailTimeRange}
+                />
+            </div>
+        </div>
       )}
 
       {/* --- User Management view with pagination --- */}
@@ -271,9 +334,10 @@ const AdminAnalytics: React.FC = () => {
                                 <td
                                     className="clickable-name"
                                     onClick={() => fetchUserStats(user._id)}
-                                    title="Click to view detailed stats"
                                 >
-                                  {user.firstName} {user.lastName}
+                                  <Tooltip text="Click to view detailed stats">
+                                    {user.firstName} {user.lastName}
+                                  </Tooltip>
                                 </td>
                                 <td>{user.email}</td>
                                 <td>{user.role}</td>
@@ -283,8 +347,8 @@ const AdminAnalytics: React.FC = () => {
                                 <td>
                                     {user.bciStatus === 'Pending' && (
                                         <div className="action-buttons">
-                                            <button className="approve-btn" onClick={() => handleStatusUpdate(user._id, 'Verified')}>Approve</button>
-                                            <button className="reject-btn" onClick={() => handleStatusUpdate(user._id, 'Rejected')}>Reject</button>
+                                            <button className="approve-btn" onClick={() => triggerStatusUpdate(user._id, 'Verified')}>Approve</button>
+                                            <button className="reject-btn" onClick={() => triggerStatusUpdate(user._id, 'Rejected')}>Reject</button>
                                         </div>
                                     )}
                                 </td>
@@ -292,6 +356,20 @@ const AdminAnalytics: React.FC = () => {
                         ))}
                     </tbody>
                 </table>
+
+                {/* Modal for Confirmation */}
+                {modalConfig && (
+                    <ConfirmationModal
+                        isOpen={modalOpen}
+                        title={modalConfig.title}
+                        message={modalConfig.message}
+                        type={modalConfig.type}
+                        onConfirm={modalConfig.onConfirm}
+                        onCancel={() => setModalOpen(false)}
+                        confirmText={modalConfig.type === 'danger' ? 'Reject' : 'Approve'}
+                    />
+                )}
+
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
                     <div className="pagination-controls">
