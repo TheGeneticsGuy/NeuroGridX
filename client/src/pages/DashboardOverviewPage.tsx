@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuthStore } from '../store/auth.store';
 import UserStats from '../components/dashboard/UserStats';
+import PerformanceChart from '../components/charts/PerformanceChart';
 import { type Attempt } from '../types/challenge.types';
 import ModeSelector, { type StatMode } from '../components/dashboard/ModeSelector';
 import './DashboardPage.css';
@@ -14,6 +15,8 @@ const DashboardOverviewPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [chartRange, setChartRange] = useState<number | 'all'>(30); // Default 30 days
+  const [chartChallenge, setChartChallenge] = useState<string>('Reaction Time'); // Default
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -43,6 +46,14 @@ const DashboardOverviewPage: React.FC = () => {
     setCurrentPage(1);
   }, [statMode]);
 
+  // Filtering for the graphs specifically
+  const chartAttempts = useMemo(() => {
+    return allAttempts.filter(a =>
+        a.challengeType === chartChallenge &&
+        (a.settings?.mode || 'Normal') === statMode
+    );
+  }, [allAttempts, chartChallenge, statMode]);
+
   const filteredAttempts = useMemo(() => {
     return allAttempts.filter(attempt => {
       const mode = attempt.settings?.mode || 'Normal';
@@ -55,6 +66,7 @@ const DashboardOverviewPage: React.FC = () => {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(prev => prev - 1);
@@ -79,6 +91,43 @@ const DashboardOverviewPage: React.FC = () => {
         <>
           {/* Pass filtered attempts to stats component */}
           <UserStats attempts={filteredAttempts} />
+
+          {/* For the graphs */}
+          <div className="chart-section-container">
+            <div className="chart-controls">
+                <h3>Performance Trends</h3>
+                <div className="chart-filters">
+                    <select
+                        value={chartChallenge}
+                        onChange={(e) => setChartChallenge(e.target.value)}
+                        className="dashboard-select"
+                    >
+                        <option value="Reaction Time">Reaction Time</option>
+                        <option value="Line Tracing">Line Tracing</option>
+                    </select>
+
+                    <select
+                        value={chartRange}
+                        onChange={(e) => setChartRange(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                        className="dashboard-select"
+                    >
+                        <option value={7}>Last 7 Days</option>
+                        <option value={30}>Last 30 Days</option>
+                        <option value={60}>Last 60 Days</option>
+                        <option value={90}>Last 90 Days</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="chart-wrapper">
+                <PerformanceChart
+                    attempts={chartAttempts}
+                    challengeName={`${chartChallenge} (${statMode})`}
+                    days={chartRange}
+                />
+            </div>
+          </div>
 
           <h2>Recent Attempts ({statMode} Mode)</h2>
           {filteredAttempts.length === 0 ? (
