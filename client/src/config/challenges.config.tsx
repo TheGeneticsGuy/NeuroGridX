@@ -19,7 +19,7 @@ export const challenges: ChallengeConfig[] = [
         name: 'Line Tracing',
         path: '/challenges/line-tracing',
         StatCardComponent: LineTraceStatCard,
-        isEnabled: false,
+        isEnabled: true,
     },
     {
         key: 'velocity-control',

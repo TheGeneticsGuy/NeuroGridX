@@ -17,6 +17,7 @@
   --color-logo: #fff;
   --color-nav-links: #ddd;
   --form-input-background: #3f3f3f;
+  --color-table-hover: #2a2a2a;
 
   /* BCI Verification coloring */
   --color-status-success-bg: rgba(39, 174, 96, 0.2);
@@ -47,6 +48,7 @@
   --color-logo: black;
   --color-nav-links: black;
   --form-input-background: #fff;
+  --color-table-hover: #f0f0f0;
 
   /* BCI Verification coloring */
   --color-status-success-bg: rgba(39, 174, 96, 0.15);
