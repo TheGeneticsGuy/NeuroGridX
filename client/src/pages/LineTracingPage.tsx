@@ -173,7 +173,7 @@ const LineTracingPage: React.FC = () => {
         if (isOffPath) {
             const jumpSize = currentPct - exitProgress;
             if (jumpSize > MAX_PROGRESS_JUMP) {
-                failGame("Cheating detected: Skipped section!");
+                failGame("Section Skip Detected! Please try again!");
                 return;
             }
             returnToPath();

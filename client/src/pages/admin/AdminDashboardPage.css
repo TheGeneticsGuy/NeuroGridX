@@ -1,0 +1,147 @@
+.admin-dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.admin-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0 3rem 0;
+}
+
+.admin-tab-btn {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  background-color: var(--color-background-mute);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 200px;
+}
+
+.admin-tab-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.admin-tab-btn.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.admin-content-area {
+  text-align: left;
+  background-color: var(--color-background-soft);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  padding: 2rem;
+  min-height: 500px;
+}
+
+/* AdminAnalytics */
+
+.admin-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.filter-btn {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.filter-btn.active {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.admin-search {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background-mute);
+    color: var(--color-text-primary);
+    width: 250px;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.admin-table th {
+    background-color: var(--color-background-mute);
+    font-weight: bold;
+}
+
+.status-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.status-badge.verified {
+    background-color: rgba(39, 174, 96, 0.2);
+    color: #2ecc71;
+}
+.status-badge.pending {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+}
+.status-badge.rejected {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+.status-badge.none {
+    color: var(--color-text-secondary);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.approve-btn, .reject-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.approve-btn {
+    background-color: #27ae60;
+    color: white;
+}
+.reject-btn {
+    background-color: #e74c3c;
+    color: white;
+}

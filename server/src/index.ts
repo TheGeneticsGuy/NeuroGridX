@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.routes';
 // Route Imports
 import userRoutes from './routes/user.routes';
 import challengeRoutes from './routes/challenge.routes';
+import adminRoutes from './routes/admin.routes';
 
 dotenv.config();
 connectDB(); // Connect to MongoDB
@@ -34,14 +35,15 @@ const PORT = process.env.PORT || 5001;  // Local will be 5001
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
-app.use('/api/auth', authRoutes);
 
 // Swagger
 setupSwagger(app);
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/challenges', challengeRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Test route
 app.get('/api', (req: Request, res: Response) => {

@@ -36,3 +36,12 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     return res.status(401).json({ message: 'Not authorized, no JWT token' });
   }
 };
+
+// Admin Middleware
+export const admin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user && req.user.role === 'Admin') {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as an admin' });
+  }
+};

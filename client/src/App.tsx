@@ -12,6 +12,7 @@ import DashboardOverviewPage from './pages/DashboardOverviewPage';
 import ProfilePage from './pages/ProfilePage';
 import SecurityPage from './pages/SecurityPage';
 import LineTracingPage from './pages/LineTracingPage';
+import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
 function App() {
 
@@ -36,6 +37,11 @@ function App() {
               <Route path="profile" element={<ProfilePage />} />
               <Route path="security" element={<SecurityPage />} />
             </Route>
+          </Route>
+
+          {/* Admin Protected Routes */}
+          <Route path="/admin" element={<ProtectedRoute />}>
+            <Route index element={<AdminDashboardPage />} />
           </Route>
         </Routes>
       </Layout>
