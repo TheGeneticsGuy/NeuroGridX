@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import challengeRoutes from './routes/challenge.routes';
 import adminRoutes from './routes/admin.routes';
+import analyticsRoutes from './routes/analytics.routes';
 
 dotenv.config();
 connectDB(); // Connect to MongoDB
@@ -44,6 +45,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/challenges', challengeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
 
 // Test route
 app.get('/api', (req: Request, res: Response) => {
