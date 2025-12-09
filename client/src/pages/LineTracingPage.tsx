@@ -2,18 +2,26 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAuthStore } from '../store/auth.store';
 import { useLineTracingStore } from '../store/lineTracing.store';
 import axios from 'axios';
-import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard'; // Import the stat card
-import { type Attempt } from '../types/challenge.types'; // Import the type
+import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
+import { type Attempt } from '../types/challenge.types';
 import './LineTracingPage.css';
 
 const MAX_OFF_PATH_DISTANCE = 150;
 const MAX_PROGRESS_JUMP = 5;
 
+interface FloatingText {
+  id: number;
+  x: number;
+  y: number;
+  text: string;
+  className?: string;
+}
+
 const LineTracingPage: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const {
-    gameState, score, timeElapsed, progress, pathPoints, lineWidth,
+    gameState, score, timeRemaining, progress, pathPoints, lineWidth,
     penalties, isOffPath, graceTimeRemaining, failReason,
     generatePath, startGame, completeGame, updateProgress,
     resetGame, goOffPath, returnToPath, failGame,
@@ -30,9 +38,12 @@ const LineTracingPage: React.FC = () => {
   const [userAttempts, setUserAttempts] = useState<Attempt[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  // Fixed dimensions the same as the reaction time challenge
+  // Fixed dimensions
   const CANVAS_WIDTH = 1000;
   const CANVAS_HEIGHT = 600;
+
+  // --- NEW: Floating Text State ---
+  const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
   useEffect(() => {
     return () => resetGame();
@@ -57,7 +68,7 @@ const LineTracingPage: React.FC = () => {
       }
     };
     fetchAttempts();
-  }, [isAuthenticated, token, gameState]); // Re-fetch when game state changes
+  }, [isAuthenticated, token, gameState]);
 
   // Generate path on mount
   useEffect(() => {
@@ -66,7 +77,7 @@ const LineTracingPage: React.FC = () => {
     }
   }, [generatePath, pathPoints.length]);
 
-  // CANVAS DRAWING (Unchanged)
+  // CANVAS DRAWING
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || pathPoints.length < 2) return;
@@ -165,9 +176,11 @@ const LineTracingPage: React.FC = () => {
     ctx.lineWidth = lineWidth;
 
     const isOnPath = ctx.isPointInStroke(x, y);
-    const totalDist = pathPoints[pathPoints.length-1].x - pathPoints[0].x;
+    // const totalDist = pathPoints[pathPoints.length-1].x - pathPoints[0].x; // Pending enhancement
     const currentDist = x - pathPoints[0].x;
-    const currentPct = Math.max(0, Math.min(100, (currentDist / totalDist) * 100));
+    // totalDist logic for percent
+    const totalPathWidth = pathPoints[pathPoints.length - 1].x - pathPoints[0].x;
+    const currentPct = Math.max(0, Math.min(100, (currentDist / totalPathWidth) * 100));
 
     if (isOnPath) {
         if (isOffPath) {
@@ -187,6 +200,22 @@ const LineTracingPage: React.FC = () => {
             completeGame();
         }
     } else {
+        // Floating Penalty
+        if (!isOffPath) {
+             const PENALTY_AMOUNT = 500;
+             const penaltyText: FloatingText = {
+                id: Date.now(),
+                x: e.clientX,
+                y: e.clientY,
+                text: `-${PENALTY_AMOUNT}`,
+                className: 'penalty',
+             };
+             setFloatingTexts(prev => [...prev, penaltyText]);
+             setTimeout(() => {
+                setFloatingTexts(prev => prev.filter(ft => ft.id !== penaltyText.id));
+             }, 800);
+        }
+
         goOffPath();
         if (lastValidPosition) {
             const distFromValid = Math.sqrt(Math.pow(x - lastValidPosition.x, 2) + Math.pow(y - lastValidPosition.y, 2));
@@ -208,10 +237,14 @@ const LineTracingPage: React.FC = () => {
     const save = async () => {
         if ((gameState === 'Finished' || gameState === 'Failed') && isAuthenticated && token) {
             try {
+                // Calculated time taken
+                // 30.0 to ensure float, though i guess JS does this anyway, if I remember
+                const timeTaken = 30 - timeRemaining;
+
                 await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/challenges/attempts`, {
                     challengeType: 'Line Tracing',
                     score: score,
-                    completionTime: timeElapsed,
+                    completionTime: timeTaken, // Send actual time
                     accuracy: progress / 100,
                     ntpm: penalties,
                     settings: { mode: 'Normal' }
@@ -220,13 +253,14 @@ const LineTracingPage: React.FC = () => {
         }
     };
     save();
-  }, [gameState, isAuthenticated, token, score, timeElapsed, progress, penalties]);
+  }, [gameState, isAuthenticated, token, score, timeRemaining, progress, penalties]);
 
   return (
     <div className="line-tracing-wrapper">
         <div className="tracing-hud-area">
             <div className="tracing-hud">
-                <div>Time: {timeElapsed.toFixed(1)}s</div>
+                {/* Display Time Remaining */}
+                <div>Time: {timeRemaining.toFixed(1)}s</div>
                 <div style={{color: penalties > 0 ? '#ff6b6b' : 'inherit'}}>
                     Penalties: {penalties}
                 </div>
@@ -245,6 +279,17 @@ const LineTracingPage: React.FC = () => {
                         (gameState === 'NotStarted' && isOverStartZone) ? 'pointer-cursor' : ''
                     }
                 />
+
+                {/* Floating Text */}
+                {floatingTexts.map(ft => (
+                    <div
+                    key={ft.id}
+                    className={`floating-score ${ft.className || ''}`}
+                    style={{ left: ft.x, top: ft.y }}
+                    >
+                    {ft.text}
+                    </div>
+                ))}
 
                 {/* Main Overlay */}
                 {gameState === 'NotStarted' && !isPreviewing && (
@@ -289,7 +334,31 @@ const LineTracingPage: React.FC = () => {
                     <div className="game-overlay">
                         <h1 style={{color: '#ff6b6b'}}>Failed!</h1>
                         <p>{failReason || "You went off the path."}</p>
-                        <button onClick={() => resetGame()} className="cta-button">Try Again</button>
+
+                        <div className="score-breakdown" style={{padding: '1rem', width: 'auto'}}>
+                            <p style={{fontSize: '1.2rem', margin: 0}}>
+                                Distance Traveled: <span>{progress.toFixed(1)}%</span>
+                            </p>
+                        </div>
+
+                        <div className="button-group">
+                            <button onClick={() => {
+                                // current path BEFORE reset
+                                const currentPath = pathPoints;
+                                resetGame();
+                                // Pass existing path back in to retry
+                                generatePath(CANVAS_WIDTH, CANVAS_HEIGHT, currentPath);
+                            }} className="cta-button">
+                                Retry Path
+                            </button>
+
+                            <button onClick={() => {
+                                resetGame();
+                                generatePath(CANVAS_WIDTH, CANVAS_HEIGHT); // Generate new path
+                            }} className="cta-button secondary">
+                                New Path
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -297,13 +366,36 @@ const LineTracingPage: React.FC = () => {
                 {gameState === 'Finished' && (
                     <div className="game-overlay">
                         <h1 style={{color: '#2ecc71'}}>Success!</h1>
-                        <p>Score: {score}</p>
-                        <p>Penalties: {penalties}</p>
-                        <button onClick={() => {
-                             resetGame();
-                             generatePath(CANVAS_WIDTH, CANVAS_HEIGHT);
-                             setIsPreviewing(true);
-                        }} className="cta-button">New Game</button>
+
+                        <div className="score-breakdown">
+                            <p>Completion Bonus: <span>+1,000</span></p>
+                            <p>Time Bonus: <span>+{Math.round(timeRemaining * 100).toLocaleString()}</span></p>
+                            <p style={{color: '#ff6b6b'}}>Penalties: <span>-{ (penalties * 500).toLocaleString() }</span></p>
+                            <div className="score-divider"></div>
+                            <p className="final-score">Final Score: <span>{score.toLocaleString()}</span></p>
+                        </div>
+
+                        {/* Retry or new buttons */}
+                        <div className="button-group">
+                            <button onClick={() => {
+                                // Capture current path BEFORE reset
+                                const currentPath = pathPoints;
+                                resetGame();
+                                // Pass existing path back in to retry
+                                generatePath(CANVAS_WIDTH, CANVAS_HEIGHT, currentPath);
+                                setIsPreviewing(false); // Go to start screen
+                            }} className="cta-button">
+                                Retry Path
+                            </button>
+
+                            <button onClick={() => {
+                                 resetGame();
+                                 generatePath(CANVAS_WIDTH, CANVAS_HEIGHT);
+                                 setIsPreviewing(true); // Preview new path
+                            }} className="cta-button secondary">
+                                New Path
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>

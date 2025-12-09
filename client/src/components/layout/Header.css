@@ -64,3 +64,8 @@
   align-items: center;
   gap: 1.5rem;
 }
+
+.admin-link {
+    color: var(--color-danger) !important; /* Making it red just to stand out as admin */
+    font-weight: bold;
+}

@@ -31,7 +31,12 @@ const Header: React.FC = () => {
               <> {/* Using a React Fragment */}
                 <Link to="/dashboard">Dashboard</Link>
 
-                <span className="user-info">Role: {user?.role}</span>   {/*TESTING ROLE - TODO: Remove */}
+                {/* Admin Only Dash */}
+                {user?.role === 'Admin' && (
+                      <Link to="/admin" className="admin-link">Admin</Link>
+                  )}
+
+                <span className="user-info">Role: {user?.role}</span>
                 <button onClick={handleLogout} className="logout-button">
                   Logout
                 </button>

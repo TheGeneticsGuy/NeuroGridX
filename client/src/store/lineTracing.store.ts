@@ -13,13 +13,13 @@ export interface Point {
   y: number;
 }
 
-const AUTOFAILTIME = 120;
+const TOTAL_TIME = 30;
 const BASE_WIDTH = 50;
 
 interface LineTracingStore {
   gameState: GameState;
   score: number;
-  timeElapsed: number;
+  timeRemaining: number;
   progress: number;
   pathPoints: Point[];
   lineWidth: number;
@@ -29,8 +29,8 @@ interface LineTracingStore {
   failReason: string | null;
 
   // Anti-Cheat State to Prevent mouse jumping on exit
-  lastValidPosition: Point | null; // Where did they leave the path?
-  exitProgress: number; // What was their % when they left? They need to return at same point
+  lastValidPosition: Point | null;
+  exitProgress: number;
 
   // Actions
   generatePath: (width: number, height: number, existingPath?: Point[]) => void;
@@ -38,7 +38,7 @@ interface LineTracingStore {
   failGame: (reason?: string) => void;
   completeGame: () => void;
   updateProgress: (percent: number) => void;
-  updateLastValidPosition: (p: Point, prog: number) => void; // New
+  updateLastValidPosition: (p: Point, prog: number) => void;
   resetGame: () => void;
   goOffPath: () => void;
   returnToPath: () => void;
@@ -49,7 +49,7 @@ interface LineTracingStore {
 export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
   gameState: GameState.NotStarted,
   score: 0,
-  timeElapsed: 0,
+  timeRemaining: TOTAL_TIME, // Start at 30
   progress: 0,
   pathPoints: [],
   lineWidth: BASE_WIDTH,
@@ -69,9 +69,8 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
 
     const points: Point[] = [];
     const numPoints = 6;
-    const paddingX = 50; // Fixed padding to keep it consistent
+    const paddingX = 50;
 
-    // This is ensuring we start EXACTLY at physical start point.
     const segmentWidth = (width - (paddingX * 2)) / (numPoints - 1);
 
     for (let i = 0; i < numPoints; i++) {
@@ -89,7 +88,7 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
     set({
       gameState: GameState.InProgress,
       score: 0,
-      timeElapsed: 0,
+      timeRemaining: TOTAL_TIME, // Reset to 30
       progress: 0,
       penalties: 0,
       isOffPath: false,
@@ -99,11 +98,11 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
       exitProgress: 0
     });
 
-    const startTime = Date.now();
     const interval = window.setInterval(() => {
       const state = get();
-      const now = Date.now();
-      const elapsed = (now - startTime) / 1000;
+
+      // TIMER LOGIC (Count Down)
+      let newTime = state.timeRemaining - 0.1;
 
       let newGraceTime = state.graceTimeRemaining;
 
@@ -117,9 +116,10 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
           newGraceTime = 2.0;
       }
 
-      set({ timeElapsed: elapsed, graceTimeRemaining: newGraceTime });
+      set({ timeRemaining: newTime, graceTimeRemaining: newGraceTime });
 
-      if (elapsed >= AUTOFAILTIME) {
+      // Auto-fail at 0
+      if (newTime <= 0) {
         get().failGame("Time limit exceeded.");
       }
     }, 100);
@@ -159,12 +159,21 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
 
   completeGame: () => {
     if (get()._timerInterval) clearInterval(get()._timerInterval as number);
-    const { timeElapsed, penalties } = get();
-    let score = Math.round(1000 + ((AUTOFAILTIME - timeElapsed) * 50));
-    score -= (penalties * 200); // Penalty that I might adjust...
-    score = Math.max(0, score);
+    const { timeRemaining, penalties } = get();
 
-    set({ gameState: GameState.Finished, score, progress: 100, _timerInterval: null });
+    // SCORING ALGORITHM
+    const COMPLETION_BONUS = 1000;
+
+    // Time Factor: 30s remaining = 3000 pts. 1s remaining = 100 pts.
+    const TIME_BONUS = Math.round(timeRemaining * 100);
+
+    // Penalty Factor - EACH mistake is massive.
+    const PENALTY_DEDUCTION = penalties * 500;
+
+    let finalScore = COMPLETION_BONUS + TIME_BONUS - PENALTY_DEDUCTION;
+    finalScore = Math.max(0, finalScore); // No negative scores
+
+    set({ gameState: GameState.Finished, score: finalScore, progress: 100, _timerInterval: null });
   },
 
   resetGame: () => {
@@ -172,7 +181,7 @@ export const useLineTracingStore = create<LineTracingStore>((set, get) => ({
     set({
       gameState: GameState.NotStarted,
       score: 0,
-      timeElapsed: 0,
+      timeRemaining: TOTAL_TIME,
       progress: 0,
       pathPoints: [],
       _timerInterval: null,
