@@ -64,6 +64,9 @@ export const loginUser = async (req: Request, res: Response) => {
         _id: user._id,
         email: user.email,
         role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        bciStatus: user.bciStatus,
         token: generateToken((user._id as Types.ObjectId).toString(), user.role),
       });
     } else {
