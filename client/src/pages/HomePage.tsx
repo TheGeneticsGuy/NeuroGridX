@@ -5,7 +5,6 @@ import './HomePage.css';
 
 const HomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuthStore();
-  console.log(user);
   return (
     <div className="home-page">
 
