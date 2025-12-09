@@ -222,10 +222,10 @@ canvas {
 }
 
 .button-group {
-    /* display: flex; */
+    display: flex;
     justify-content: center;
     align-items: center;
-    /* gap: 1rem; */
+    gap: 1rem;
     margin-top: 1rem;
     width: 100%;
 }
@@ -234,6 +234,7 @@ canvas {
     background-color: transparent;
     border-color: var(--color-primary);
     color: var(--color-primary);
+    margin-bottom: 0.5rem;
 }
 
 .cta-button.secondary:hover {

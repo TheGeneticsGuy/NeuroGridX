@@ -375,13 +375,11 @@ const LineTracingPage: React.FC = () => {
                             <p className="final-score">Final Score: <span>{score.toLocaleString()}</span></p>
                         </div>
 
-                        {/* Retry or new buttons */}
+                        {/* Retry or new */}
                         <div className="button-group">
                             <button onClick={() => {
-                                // Capture current path BEFORE reset
                                 const currentPath = pathPoints;
                                 resetGame();
-                                // Pass existing path back in to retry
                                 generatePath(CANVAS_WIDTH, CANVAS_HEIGHT, currentPath);
                                 setIsPreviewing(false); // Go to start screen
                             }} className="cta-button">
