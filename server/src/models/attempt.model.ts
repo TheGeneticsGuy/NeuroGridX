@@ -7,6 +7,7 @@ export interface IAttempt extends Document {
   completionTime: number;
   accuracy: number;
   ntpm?: number; // Net Targets Per Minute
+  penalties?: number;
   averageClickAccuracy?: number; // 0 to 1
   settings?: {
     mode: string; // Normal or Advanced
@@ -22,6 +23,7 @@ const attemptSchema: Schema<IAttempt> = new Schema(
     completionTime: { type: Number, required: true },
     accuracy: { type: Number, required: true },
     ntpm: { type: Number, required: false },
+    penalties: { type: Number, required: false },
     averageClickAccuracy: { type: Number, required: false },
     settings: { type: Object, required: false },
   }, { timestamps: true });

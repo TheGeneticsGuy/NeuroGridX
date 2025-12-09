@@ -246,7 +246,8 @@ const LineTracingPage: React.FC = () => {
                     score: score,
                     completionTime: timeTaken, // Send actual time
                     accuracy: progress / 100,
-                    ntpm: penalties,
+                    penalties: penalties,
+                    ntpm: undefined,
                     settings: { mode: 'Normal' }
                 }, { headers: { Authorization: `Bearer ${token}` } });
             } catch(e) { console.error(e); }

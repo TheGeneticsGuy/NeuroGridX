@@ -69,3 +69,15 @@
     color: var(--color-danger) !important; /* Making it red just to stand out as admin */
     font-weight: bold;
 }
+
+.user-info {
+  background-color: var(--color-background-mute);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-left: 1rem;
+  pointer-events: none; /*I w as getting hover events - forcing it not to. Inherited? */
+}

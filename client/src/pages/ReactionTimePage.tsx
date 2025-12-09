@@ -72,17 +72,25 @@ const ReactionTimePage: React.FC = () => {
 
       if (gameState === 'Finished' && isAuthenticated && token) {
         try {
+
           const finalScore = {
-            challengeType: 'Reaction Time', score, completionTime: TOTAL_TIME,
-            accuracy: hits > 0 ? hits / (hits + misses) : 0, ntpm, averageClickAccuracy,
+            challengeType: 'Reaction Time',
+            score,
+            completionTime: TOTAL_TIME,
+            accuracy: hits > 0 ? hits / (hits + misses) : 0,
+            ntpm,
+            averageClickAccuracy,
+            penalties: misses,
             settings: {
               mode: gameSettings.isAdvanced ? 'Advanced' : 'Normal',
               speed: gameSettings.isAdvanced ? gameSettings.speed : undefined,
             }
           };
+
           await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/challenges/attempts`, finalScore, {
             headers: { Authorization: `Bearer ${token}` },
           });
+
           console.log("Score saved successfully!");
         } catch (error: any) {
           console.error("Failed to save score:", error);

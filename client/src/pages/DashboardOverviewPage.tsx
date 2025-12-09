@@ -4,6 +4,8 @@ import { useAuthStore } from '../store/auth.store';
 import UserStats from '../components/dashboard/UserStats';
 import PerformanceChart from '../components/charts/PerformanceChart';
 import { type Attempt } from '../types/challenge.types';
+import ReactionTimeTable from '../components/dashboard/tables/ReactionTimeTable';
+import LineTracingTable from '../components/dashboard/tables/LineTracingTable';
 import ModeSelector, { type StatMode } from '../components/dashboard/ModeSelector';
 import './DashboardPage.css';
 
@@ -14,9 +16,13 @@ const DashboardOverviewPage: React.FC = () => {
   const [allAttempts, setAllAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Pagination logic
   const [currentPage, setCurrentPage] = useState(1);
   const [chartRange, setChartRange] = useState<number | 'all'>(30); // Default 30 days
   const [chartChallenge, setChartChallenge] = useState<string>('Reaction Time'); // Default
+  const [activeTab, setActiveTab] = useState<'Reaction Time' | 'Line Tracing'>('Reaction Time');
+  const [statMode, setStatMode] = useState<StatMode>('Normal');
 
   useEffect(() => {
     const fetchAttempts = async () => {
@@ -40,11 +46,10 @@ const DashboardOverviewPage: React.FC = () => {
     fetchAttempts();
   }, [token]);
 
-  // Pagination logic
-  const [statMode, setStatMode] = useState<StatMode>('Normal');
+  // Reset pagination when tab or mode changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [statMode]);
+  }, [statMode, activeTab]);
 
   // Filtering for the graphs specifically
   const chartAttempts = useMemo(() => {
@@ -54,19 +59,29 @@ const DashboardOverviewPage: React.FC = () => {
     );
   }, [allAttempts, chartChallenge, statMode]);
 
-  const filteredAttempts = useMemo(() => {
+  // Filter attempts based on the active tab AND the selected mode
+  const tabAttempts = useMemo(() => {
+      return allAttempts.filter(a =>
+        a.challengeType === activeTab &&
+        (a.settings?.mode || 'Normal') === statMode
+      );
+  }, [allAttempts, activeTab, statMode]);
+
+  // General filtered attempts for the Summary Cards (UserStats)
+  // We want to show stats for the selected mode across all games
+  const statsAttempts = useMemo(() => {
     return allAttempts.filter(attempt => {
       const mode = attempt.settings?.mode || 'Normal';
       return mode === statMode;
     });
   }, [allAttempts, statMode]);
 
-  const totalPages = Math.ceil(filteredAttempts.length / ITEMS_PER_PAGE);
-  const displayedAttempts = filteredAttempts.slice(
+
+  const totalPages = Math.ceil(tabAttempts.length / ITEMS_PER_PAGE);
+  const displayedAttempts = tabAttempts.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
-
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(prev => prev - 1);
@@ -90,7 +105,7 @@ const DashboardOverviewPage: React.FC = () => {
       {!loading && !error && (
         <>
           {/* Pass filtered attempts to stats component */}
-          <UserStats attempts={filteredAttempts} />
+          <UserStats attempts={statsAttempts} />
 
           {/* For the graphs */}
           <div className="chart-section-container">
@@ -130,34 +145,31 @@ const DashboardOverviewPage: React.FC = () => {
           </div>
 
           <h2>Recent Attempts ({statMode} Mode)</h2>
-          {filteredAttempts.length === 0 ? (
-            <p className="no-attempts-message">No attempts found for {statMode} mode.</p>
+
+          {/* Table tab selector */}
+          <div className="table-tabs">
+              <button
+                className={activeTab === 'Reaction Time' ? 'active' : ''}
+                onClick={() => setActiveTab('Reaction Time')}
+              >
+                Reaction Time
+              </button>
+              <button
+                className={activeTab === 'Line Tracing' ? 'active' : ''}
+                onClick={() => setActiveTab('Line Tracing')}
+              >
+                Line Tracing
+              </button>
+          </div>
+
+          {tabAttempts.length === 0 ? (
+            <p className="no-attempts-message">No {activeTab} attempts found for {statMode} mode.</p>
           ) : (
             <>
-            <table className="attempts-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Challenge</th>
-                  <th>Score</th>
-                  <th>Speed</th>
-                  <th>NTPM</th>
-                  <th>Click Accuracy</th>
-                </tr>
-              </thead>
-              <tbody>
-                {displayedAttempts.map((attempt) => (
-                <tr key={attempt._id}>
-                    <td>{new Date(attempt.createdAt).toLocaleDateString()}</td>
-                    <td>{attempt.challengeType}</td>
-                    <td>{attempt.score.toLocaleString()}</td>
-                    <td>{attempt.settings?.speed ?? 'N/A'}</td>
-                    <td>{attempt.ntpm ?? 'N/A'}</td>
-                    <td>{attempt.averageClickAccuracy ? `${(attempt.averageClickAccuracy * 100).toFixed(1)}%` : 'N/A'}</td>
-                </tr>
-                ))}
-              </tbody>
-            </table>
+              {/* Render which table is selected*/}
+              {activeTab === 'Reaction Time' && <ReactionTimeTable attempts={displayedAttempts} />}
+              {activeTab === 'Line Tracing' && <LineTracingTable attempts={displayedAttempts} />}
+
               {totalPages > 1 && (
                 <div className="pagination-controls">
                   <button
