@@ -8,6 +8,8 @@ export interface Attempt {
     ntpm?: number;
     averageClickAccuracy?: number;
     createdAt: string;
+    completionTime: number;
+    penalties?: number;
     settings?: {
       mode: 'Normal' | 'Advanced';
       speed?: 'Normal' | 'Medium' | 'Fast';
