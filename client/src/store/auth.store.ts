@@ -53,14 +53,18 @@ export const useAuthStore = create<AuthState>()(
           set({ token: null, user: null, isAuthenticated: false });
         }
       },
-      updateUser: (data) => {
+      updateUser: (data: any) => {
         try {
-            const decodedUser: User = jwtDecode(data.token);
-            set({
+            const decodedUser: any = jwtDecode(data.token);
+            set((state) => ({
                 token: data.token,
-                user: decodedUser,
+                user: {
+                    ...state.user,
+                    ...decodedUser,
+                    ...data
+                } as User,
                 isAuthenticated: true,
-            });
+            }));
         } catch (error) {
             console.error("Failed to decode token when updating user:", error);
         }
