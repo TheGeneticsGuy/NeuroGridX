@@ -13,6 +13,7 @@ import ProfilePage from './pages/ProfilePage';
 import SecurityPage from './pages/SecurityPage';
 import LineTracingPage from './pages/LineTracingPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
+import AboutPage from './pages/AboutPage';
 
 function App() {
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/challenges" element={<ChallengesPage />} />
           <Route path="/challenges/reaction-time" element={<ReactionTimePage />} />
           <Route path="/challenges/line-tracing" element={<LineTracingPage />} />
+          <Route path="/about" element={<AboutPage />} />
 
           {/* Protected Routes */}
           <Route path="/dashboard" element={<ProtectedRoute />}>

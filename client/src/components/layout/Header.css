@@ -79,5 +79,4 @@
   font-weight: 600;
   color: var(--color-text-secondary);
   margin-left: 1rem;
-  pointer-events: none; /*I w as getting hover events - forcing it not to. Inherited? */
 }

@@ -42,7 +42,7 @@ const LineTracingPage: React.FC = () => {
   const CANVAS_WIDTH = 1000;
   const CANVAS_HEIGHT = 600;
 
-  // --- NEW: Floating Text State ---
+  // Floating Text State ---
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
   useEffect(() => {

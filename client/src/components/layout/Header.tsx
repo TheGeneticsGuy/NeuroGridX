@@ -18,7 +18,7 @@ const Header: React.FC = () => {
     <header className="app-header">
       <div className="header-container">
         <Link to="/" className="logo">
-          NeuroGrid
+          NeuroGridX
         </Link>
         <div>
           <ThemeToggle /> MODE

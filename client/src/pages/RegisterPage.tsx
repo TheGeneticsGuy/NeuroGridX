@@ -55,7 +55,7 @@ const RegisterPage: React.FC = () => {
         isBciApplicant,
         bciCompany
       });
-      setToken(response.data.token);
+      setToken(response.data.token, response.data);
       navigate('/dashboard'); // Navigate to dashboard on successful registration
 
     } catch (err: any) {
@@ -73,7 +73,7 @@ const RegisterPage: React.FC = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google-token`, {
         token: credentialResponse.credential,
       });
-      setToken(res.data.token);
+      setToken(res.data.token, res.data);
       navigate('/dashboard'); // Navigate to dashboard on successful registration
     } catch (err) {
       console.error('Google registration failed', err);

@@ -71,10 +71,15 @@ router.post('/google-token', async (req, res) => {
     }
 
     const appToken = generateToken((user._id as Types.ObjectId).toString(), user.role);
+
     res.status(200).json({
       _id: user._id,
       email: user.email,
       role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      avatarUrl: user.avatarUrl,
+      bciStatus: user.bciStatus,
       token: appToken,
     });
 

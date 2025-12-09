@@ -4,7 +4,13 @@ import { jwtDecode } from 'jwt-decode';
 
 interface User {
   id: string;
+  email: string;
   role: 'Standard' | 'BCI' | 'Admin';
+  firstName?: string;
+  lastName?: string;
+  bio?: string;
+  avatarUrl?: string;
+  bciStatus?: 'None' | 'Pending' | 'Verified' | 'Rejected';
 }
 
 // Store's state/actions
@@ -12,7 +18,7 @@ interface AuthState {
   token: string | null;
   user: User | null;
   isAuthenticated: boolean;
-  setToken: (token: string) => void;
+  setToken: (token: string, userData?: Partial<User>) => void;
   updateUser: (data: { token: string }) => void;
   logout: () => void;
 }
@@ -24,15 +30,23 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isAuthenticated: false,
-      setToken: (token) => {
+      setToken: (token, userData = {}) => {
         try {
           // Decode the token
-          const decodedUser: User = jwtDecode(token);
-          set({
+          const decodedUser: any = jwtDecode(token);
+        // Merge decoded token data with provided user data (like firstName)
+        const fullUser: User = {
+            id: decodedUser.id,
+            email: decodedUser.email,
+            role: decodedUser.role,
+            ...userData // Spread the extra data (firstName, lastName, etc.)
+        };
+
+        set({
             token,
-            user: decodedUser,
+            user: fullUser,
             isAuthenticated: true,
-          });
+        });
         } catch (error) {
           console.error("Failed to decode token:", error);
           // Clearing auth state if get corrupted token

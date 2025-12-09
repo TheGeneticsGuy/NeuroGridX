@@ -32,7 +32,7 @@ const LoginPage: React.FC = () => {
         email,
         password,
       });
-      setToken(response.data.token);
+      setToken(response.data.token, response.data);
       navigate('/'); // Navigate to home on successful login
     } catch (err: any) {
       setErrors([err.response?.data?.message || 'Login failed']);
@@ -44,7 +44,7 @@ const LoginPage: React.FC = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/auth/google-token`, {
         token: credentialResponse.credential,
       });
-      setToken(res.data.token);
+      setToken(res.data.token, res.data);
       navigate('/'); // Navigate to home on successful login
     } catch (err) {
       console.error('Google login failed', err);
