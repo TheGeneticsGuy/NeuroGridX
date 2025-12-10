@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode';
 
 interface User {
   id: string;
+  _id?: string;
   email: string;
   role: 'Standard' | 'BCI' | 'Admin';
   firstName?: string;

@@ -15,7 +15,16 @@ import LineTracingPage from './pages/LineTracingPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AboutPage from './pages/AboutPage';
 
+// Websocket Needs
+import { useSocketStore } from './store/socket.store';
+import { useEffect } from 'react';
+
 function App() {
+  const { connect, disconnect } = useSocketStore()
+  useEffect(() => {
+    connect();
+    return () => disconnect();
+  }, [connect, disconnect]);
 
   return (
     <Router>

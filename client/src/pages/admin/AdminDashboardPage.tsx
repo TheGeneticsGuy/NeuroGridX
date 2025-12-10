@@ -24,16 +24,16 @@ const AdminDashboardPage: React.FC = () => {
 
       <div className="admin-tabs">
         <button
-          className={`admin-tab-btn ${activeTab === 'live' ? 'active' : ''}`}
-          onClick={() => setActiveTab('live')}
-        >
-          Live Mirror Feed
-        </button>
-        <button
           className={`admin-tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
           Analytics & Users
+        </button>
+        <button
+          className={`admin-tab-btn ${activeTab === 'live' ? 'active' : ''}`}
+          onClick={() => setActiveTab('live')}
+        >
+          Live Mirror Feed
         </button>
       </div>
 
