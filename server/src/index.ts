@@ -76,7 +76,7 @@ app.get('/api', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to the NeuroGrid API!' });
 });
 
-export const activeSessions = new Map();
+const activeSessions = new Map<string, any>();
 
 // Socket Configuration
 io.on('connection', (socket) => {
@@ -86,21 +86,28 @@ io.on('connection', (socket) => {
   socket.on('identify', (userData) => {
     // Save user info
     socket.data.user = userData;
-    // Emit that the user is online
-    io.to('admin-room').emit('user_online', userData);
   });
 
   // User starts/updates a game
   socket.on('game_update', (gameData) => {
-    // Broadcast user's data to admin room
-    // Need to attach user data so admin knows who it is
-    if (socket.data.user) {
-        io.to('admin-room').emit('live_session_update', {
-            user: socket.data.user,
-            game: gameData
-        });
-        activeSessions.set(socket.data.user._id, { user: socket.data.user, game: gameData });
-    }
+    if (!socket.data.user) return;
+
+    const sessionData = {
+        socketId: socket.id,
+        user: socket.data.user,
+        game: gameData,
+        lastUpdate: Date.now()
+    };
+
+    activeSessions.set(socket.id, sessionData);
+
+    // Send to admins
+    io.to('admin-room').emit('live_session_update', sessionData);
+  });
+
+  socket.on('game_end', () => {
+      activeSessions.delete(socket.id);
+      io.to('admin-room').emit('session_ended', socket.id);
   });
 
   // Admin joins the monitoring room
@@ -111,10 +118,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-    if (socket.data.user) {
-        activeSessions.delete(socket.data.user._id);
-        io.to('admin-room').emit('user_offline', socket.data.user._id);
+    if (activeSessions.has(socket.id)) {
+        activeSessions.delete(socket.id);
+        io.to('admin-room').emit('session_ended', socket.id);
     }
   });
 });

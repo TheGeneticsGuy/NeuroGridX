@@ -4,8 +4,10 @@ import { useLineTracingStore } from '../store/lineTracing.store';
 import axios from 'axios';
 import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
 import GameRulesSidebar from '../components/game/GameRulesSidebar';
+import { useSocketStore } from '../store/socket.store';
 import { type Attempt } from '../types/challenge.types';
 import './LineTracingPage.css';
+
 
 const MAX_OFF_PATH_DISTANCE = 150;
 const MAX_PROGRESS_JUMP = 5;
@@ -43,8 +45,11 @@ const LineTracingPage: React.FC = () => {
   const CANVAS_WIDTH = 1000;
   const CANVAS_HEIGHT = 600;
 
-  // Floating Text State ---
+  // Floating Text State
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
+
+  // Websocket functions
+  const { emitGameUpdate, emitGameEnd } = useSocketStore();
 
   useEffect(() => {
     return () => resetGame();
@@ -77,6 +82,27 @@ const LineTracingPage: React.FC = () => {
         generatePath(CANVAS_WIDTH, CANVAS_HEIGHT);
     }
   }, [generatePath, pathPoints.length]);
+
+  // Socket Telemetry ---
+  useEffect(() => {
+    let interval: number;
+    if (gameState === 'InProgress') {
+      interval = window.setInterval(() => {
+        emitGameUpdate({
+            type: 'Line Tracing',
+            score,
+            timeRemaining,
+            progress,
+            misses: penalties, // Map penalties to 'misses' for generic display
+            mode: 'Normal',
+            speed: '-'
+        });
+      }, 200);
+    } else if (gameState === 'Finished' || gameState === 'Failed') {
+        emitGameEnd();
+    }
+    return () => clearInterval(interval);
+  }, [gameState, score, timeRemaining, progress, penalties, emitGameUpdate, emitGameEnd]);
 
   // CANVAS DRAWING
   useEffect(() => {

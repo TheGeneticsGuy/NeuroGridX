@@ -8,6 +8,7 @@ interface SocketState {
   connect: () => void;
   disconnect: () => void;
   emitGameUpdate: (data: any) => void;
+  emitGameEnd: () => void;
 }
 
 // URL for the backend
@@ -59,5 +60,13 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     if (socket && socket.connected) {
       socket.emit('game_update', data);
     }
+  },
+
+  emitGameEnd: () => {
+    const socket = get().socket;
+    if (socket && socket.connected) {
+      socket.emit('game_end');
+    }
   }
+
 }));
