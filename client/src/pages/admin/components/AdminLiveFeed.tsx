@@ -126,13 +126,6 @@ const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
                     </>
                 )}
               </div>
-
-              <button
-                className="view-stats-btn"
-                onClick={() => onViewUser(session.user._id)}
-              >
-                View History ↗
-              </button>
             </div>
           ))}
         </div>

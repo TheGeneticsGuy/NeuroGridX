@@ -27,11 +27,13 @@ interface AnalyticsData {
 interface AdminAnalyticsProps {
     activeUserIds: Set<string>;
     onNavigateToLive: () => void;
+    initialUserId: string | null;
+    onClearSelection: () => void;
 }
 
 const USERS_PER_PAGE = 25;
 
-const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNavigateToLive }) => {
+const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNavigateToLive, initialUserId, onClearSelection }) => {
   const { token } = useAuthStore();
 
   // View State
@@ -67,6 +69,12 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNaviga
     type: 'success' | 'danger';
     onConfirm: () => void;
   } | null>(null);
+
+  useEffect(() => {
+      if (initialUserId) {
+          fetchUserStats(initialUserId); // This automatically sets viewMode to 'user-detail'
+      }
+  }, [initialUserId]);
 
   // Get the analytics now
   useEffect(() => {
@@ -246,7 +254,10 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNaviga
       {/* User Detail View */}
       {viewMode === 'user-detail' && selectedUser && (
         <div className="user-detail-view">
-            <button className="back-btn" onClick={() => setViewMode('users')}>← Back to User List</button>
+            <button
+                className="back-btn"
+                onClick={() => { setViewMode('users'); onClearSelection(); }}>← Back to User List
+            </button>
 
             <div className="user-header">
                 <h2>Stats for: {selectedUser.firstName} {selectedUser.lastName}</h2>
@@ -299,7 +310,6 @@ const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNaviga
                         Pending BCI {pendingCount > 0 && <span className="pending-badge">{pendingCount}</span>}
                     </button>
                 </div>
-                <input type="text" placeholder="Search users..." className="admin-search" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
 
                 {/* Role filtering */}
                 <div className="search-and-filter">
