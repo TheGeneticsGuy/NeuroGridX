@@ -8,22 +8,31 @@ interface GameRulesProps {
 
 const GameRulesSidebar: React.FC<GameRulesProps> = ({ mode }) => {
   const { gameSettings } = useUIStore();  // This is so i can read global settings directly.
+  const isReactionTime = mode === 'Reaction Time';
+  const effectiveAdvanced = isReactionTime && gameSettings.isAdvanced;
+  const effectiveSpeed = isReactionTime ? gameSettings.speed : 'Normal';
 
   // Calculating the pts depending on the settings
   const getMultiplier = () => {
-    if (!gameSettings.isAdvanced) return 1;
-    if (gameSettings.speed === 'Medium') return 1.66;
-    if (gameSettings.speed === 'Fast') return 2.0;
+    if (!effectiveAdvanced) return 1;
+    if (effectiveSpeed === 'Medium') return 1.66;
+    if (effectiveSpeed === 'Fast') return 2.0;
     return 1.33;
   };
 
   const mult = getMultiplier();
   const p = (base: number) => Math.round(base * mult);
 
+  // Let's get the header depending on if normal or advanced mode
+  const getTitleSuffix = () => {
+      if (mode === 'Line Tracing') return ''; // Line Tracing is always standard for now
+      return gameSettings.isAdvanced ? `(Advanced - ${gameSettings.speed})` : '(Normal)';
+  };
+
   return (
     <div className="game-rules-bottom-bar">
       <div className="rules-header">
-        <h3>Rules & Scoring {gameSettings.isAdvanced ? `(Advanced - ${gameSettings.speed})` : '(Normal)'}</h3>
+        <h3>Rules & Scoring {getTitleSuffix()}</h3>
       </div>
 
       {mode === 'Reaction Time' && (
