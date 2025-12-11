@@ -1,0 +1,71 @@
+.game-rules-bottom-bar {
+  width: 100%;
+  max-width: 1000px;
+  margin: 1rem auto;
+  background-color: var(--color-background-mute);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.rules-header h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.5rem;
+  text-align: center;
+}
+
+.rules-content-horizontal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.rule-section {
+  flex: 1;
+}
+
+.rule-section.goal {
+  min-width: 200px;
+}
+
+.rule-section.scores {
+  display: flex;
+  min-width: 400px;
+  gap: 2rem;
+  justify-content: center;
+  background-color: var(--color-background-soft);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+}
+
+.score-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.score-item .points {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.score-item.bonus .points {
+  color: var(--color-bonus-points-text);
+}
+.score-item.penalty .points {
+  color: var(--color-danger);
+}
+
+.rule-section.info {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-style: italic;
+  font-size: 01rem;
+}

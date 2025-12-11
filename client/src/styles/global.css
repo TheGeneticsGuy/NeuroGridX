@@ -31,6 +31,8 @@
   --color-status-error-bg: rgba(231, 76, 60, 0.2);
   --color-status-error-border: #e74c3c;
   --color-status-error-text: #e74c3c;
+
+  --color-bonus-points-text: #ffd700;
 }
 
 /*Override default when the <html> element has the data-theme="light" attribute*/
@@ -62,6 +64,8 @@
   --color-status-error-bg: rgba(231, 76, 60, 0.15);
   --color-status-error-border: #e74c3c;
   --color-status-error-text: #c0392b;
+
+  --color-bonus-points-text: #11ce8f;
 }
 
 body {
@@ -81,10 +85,48 @@ body {
   display: flex;
   place-items: center;
   min-height: 100vh;
-  transition: color 0.2s, background-color 0.2s; /* Smooth theme transition */
+  transition: color 0.2s, background-color 0.2s; /* Smooth light/dark transition */
 }
 
 #root {
   width: 100%;
   padding: 2rem;
+}
+
+/* Added the button global since I am not using bootstrap. I want consistency */
+.cta-button {
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary);
+  color: white;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  background-color: var(--color-primary-hover);
+}
+
+.cta-button.secondary {
+  padding: 0.8rem 2rem;
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+}
+
+.cta-button.secondary:hover {
+  background-color: var(--color-background-mute);
+}
+
+.cta-button.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
 }

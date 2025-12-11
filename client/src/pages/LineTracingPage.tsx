@@ -3,6 +3,7 @@ import { useAuthStore } from '../store/auth.store';
 import { useLineTracingStore } from '../store/lineTracing.store';
 import axios from 'axios';
 import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
+import GameRulesSidebar from '../components/game/GameRulesSidebar';
 import { type Attempt } from '../types/challenge.types';
 import './LineTracingPage.css';
 
@@ -257,7 +258,7 @@ const LineTracingPage: React.FC = () => {
   }, [gameState, isAuthenticated, token, score, timeRemaining, progress, penalties]);
 
   return (
-    <div className="line-tracing-wrapper">
+    <div className="line-tracing-wrapper" style={{flexDirection: 'column', height: 'auto', minHeight: 'calc(100vh - 80px)'}}>
         <div className="tracing-hud-area">
             <div className="tracing-hud">
                 {/* Display Time Remaining */}
@@ -399,6 +400,8 @@ const LineTracingPage: React.FC = () => {
                 )}
             </div>
         </div>
+
+        <GameRulesSidebar mode="Line Tracing" />
 
         {/* Tooltips */}
         {gameState === 'NotStarted' && isOverStartZone && (

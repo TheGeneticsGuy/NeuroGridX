@@ -29,6 +29,13 @@
   flex-direction: column; /* Stack HUD on top of Canvas */
 }
 
+.game-main-column {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
 .challenge-hud-area {
   width: 100%;
   height: 80px;
@@ -48,11 +55,11 @@
 
 .challenge-canvas-area {
   width: 100%;
-  flex-grow: 1;
+  flex-grow: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0 2rem 2rem 2rem;
+  padding: 1rem;
   box-sizing: border-box;
 }
 
@@ -71,24 +78,35 @@
 }
 
 .game-overlay {
-  max-height: 700px;
+  max-height: 90vh;
+  max-width: 90%;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  overflow-y: auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
   background-color: rgba(26, 26, 26, 0.9);
-  padding: 2rem 3rem;
+  padding: 1.5rem 2.5rem;
   border-radius: 12px;
   text-align: center;
   border: 1px solid #444;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
   align-items: center;
   color: #fff;
 }
 
 .game-overlay p {
   margin: 1px;
+}
+
+.game-overlay h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: var(--color-primary);
 }
 
 .stat-card-inline {
