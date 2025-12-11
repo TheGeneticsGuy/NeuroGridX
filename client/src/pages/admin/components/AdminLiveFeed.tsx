@@ -116,13 +116,26 @@ const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
 
                 {session.game.type === 'Reaction Time' ? (
                     <>
-                        <div className="telemetry-item"><label>Hits</label>{session.game.hits}</div>
-                        <div className="telemetry-item"><label>Misses</label>{session.game.misses}</div>
+                        <div className="telemetry-item">
+                          <label>Hits</label>
+                          {session.game.hits}
+                        </div>
+                        <div className="telemetry-item">
+                          <label>Misses</label>
+                          {session.game.misses}
+                        </div>
                     </>
                 ) : (
+                    // Line Tracing Challenge
                     <>
-                        <div className="telemetry-item"><label>Distance</label>{Math.round(session.game.progress || 0)}%</div>
-                        <div className="telemetry-item"><label>Penalties</label>{session.game.misses || 0}</div>
+                        <div className="telemetry-item">
+                            <label>Distance</label>
+                            <span>{Math.round(Number(session.game.progress || 0))}%</span>
+                        </div>
+                        <div className="telemetry-item">
+                            <label>Penalties</label>
+                            <span>{session.game.misses || 0}</span>
+                        </div>
                     </>
                 )}
               </div>

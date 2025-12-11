@@ -96,10 +96,10 @@ const LineTracingPage: React.FC = () => {
 
         emitGameUpdate({
             type: 'Line Tracing',
-            score: state.score,
-            timeRemaining,
-            progress,
-            misses: penalties,
+            score: state.score || 0,
+            timeRemaining: state.timeRemaining,
+            progress: state.progress || 0,
+            misses: state.penalties || 0,
             mode: 'Normal',
             speed: '-',
             status: 'InProgress'

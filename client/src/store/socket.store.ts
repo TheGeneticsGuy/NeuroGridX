@@ -9,6 +9,7 @@ interface SocketState {
   disconnect: () => void;
   emitGameUpdate: (data: any) => void;
   emitGameEnd: () => void;
+  activeUserIds: Set<string>;
 }
 
 // URL for the backend
@@ -17,6 +18,7 @@ const SOCKET_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 export const useSocketStore = create<SocketState>((set, get) => ({
   socket: null,
   isConnected: false,
+  activeUserIds: new Set(),
 
   connect: () => {
     if (get().socket) return; // Already connected
@@ -39,6 +41,26 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       }
     });
 
+    socket.on('live_session_update', (data: any) => {
+       set(state => {
+           const next = new Set(state.activeUserIds);
+           next.add(data.user._id);
+           return { activeUserIds: next };
+       });
+    });
+
+    socket.on('session_ended', (userId: string) => {
+       set(state => {
+           const next = new Set(state.activeUserIds);
+           next.delete(userId);
+           return { activeUserIds: next };
+       });
+    });
+
+    socket.on('init_active_sessions', (data: any[]) => {
+       set({ activeUserIds: new Set(data.map(s => s.user._id)) });
+    });
+
     socket.on('disconnect', () => {
       console.log('Disconnected from WebSocket');
       set({ isConnected: false });
@@ -46,6 +68,7 @@ export const useSocketStore = create<SocketState>((set, get) => ({
 
     set({ socket });
   },
+
 
   disconnect: () => {
     const socket = get().socket;

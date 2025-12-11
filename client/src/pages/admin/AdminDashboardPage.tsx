@@ -25,9 +25,13 @@ const AdminDashboardPage: React.FC = () => {
 
     socket.on('init_active_sessions', updateActiveList);
 
-    // For badges, only need to get a set of IDs
+    // For the live badge next to names I think ids is sufficient
     socket.on('live_session_update', (data: any) => {
-        setActiveUserIds(prev => new Set(prev).add(data.user._id));
+        setActiveUserIds(prev => {
+            const next = new Set(prev);
+            next.add(data.user._id);
+            return next;
+        });
     });
 
     socket.on('session_ended', (userId: string) => {
