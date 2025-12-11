@@ -7,7 +7,6 @@ import Tooltip from '../../../components/tooltips/tooltips';
 import ConfirmationModal from '../../../components/common/ConfirmationModal';
 import '../AdminDashboardPage.css';
 
-// --- Types ---
 interface User {
   _id: string;
   firstName: string;
@@ -25,9 +24,14 @@ interface AnalyticsData {
   totalUsers: number;
 }
 
+interface AdminAnalyticsProps {
+    activeUserIds: Set<string>;
+    onNavigateToLive: () => void;
+}
+
 const USERS_PER_PAGE = 25;
 
-const AdminAnalytics: React.FC = () => {
+const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ activeUserIds, onNavigateToLive }) => {
   const { token } = useAuthStore();
 
   // View State
@@ -64,7 +68,7 @@ const AdminAnalytics: React.FC = () => {
     onConfirm: () => void;
   } | null>(null);
 
-  // --- Let's get the analytics now ---
+  // Get the analytics now
   useEffect(() => {
     if (viewMode === 'global') {
         const fetchAnalytics = async () => {
@@ -84,7 +88,7 @@ const AdminAnalytics: React.FC = () => {
     }
   }, [token, viewMode, timeRange, globalRoleFilter]);
 
-  // --- Let's get the users for filtering ---
+  // Get the users for filtering
   const fetchUsers = async () => {
     setUserLoading(true);
     try {
@@ -128,7 +132,7 @@ const AdminAnalytics: React.FC = () => {
     }
   }, [token, viewMode]);
 
-  // --- Need to handle status ---
+  // Need to handle status
   const triggerStatusUpdate = (userId: string, newStatus: 'Verified' | 'Rejected') => {
     const isReject = newStatus === 'Rejected';
 
@@ -153,7 +157,7 @@ const AdminAnalytics: React.FC = () => {
     }
   };
 
-  // --- Get the derived state (Users) ---
+  // Get the derived state (Users)
   const pendingCount = useMemo(() => users.filter(u => u.bciStatus === 'Pending').length, [users]);
 
   const filteredUsers = useMemo(() => {
@@ -184,7 +188,7 @@ const AdminAnalytics: React.FC = () => {
         </button>
       </div>
 
-      {/* --- global view --- */}
+      {/* global view */}
       {viewMode === 'global' && (
           <div className="analytics-section">
               <div className="analytics-controls-row"> {/* Wrapper for controls */}
@@ -199,7 +203,7 @@ const AdminAnalytics: React.FC = () => {
                       </select>
                   </div>
 
-                  {/* --- Role filter --- */}
+                  {/* Role filter */}
                   <div className="range-selector">
                       <label>User Role:</label>
                       <select value={globalRoleFilter} onChange={(e) => setGlobalRoleFilter(e.target.value as any)}>
@@ -285,7 +289,7 @@ const AdminAnalytics: React.FC = () => {
         </div>
       )}
 
-      {/* --- User Management view with pagination --- */}
+      {/* User Management view with pagination */}
       {viewMode === 'users' && (
         <>
             <div className="admin-controls">
@@ -337,6 +341,15 @@ const AdminAnalytics: React.FC = () => {
                                 >
                                   <Tooltip text="Click to view detailed stats">
                                     {user.firstName} {user.lastName}
+                                    {activeUserIds.has(user._id) && (
+                                        <span
+                                            className="live-indicator-small"
+                                            onClick={(e) => { e.stopPropagation(); onNavigateToLive(); }}
+                                            title="User is playing now - Click to watch"
+                                        >
+                                            ● LIVE
+                                        </span>
+                                    )}
                                   </Tooltip>
                                 </td>
                                 <td>{user.email}</td>

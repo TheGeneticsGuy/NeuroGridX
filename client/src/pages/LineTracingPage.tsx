@@ -51,9 +51,13 @@ const LineTracingPage: React.FC = () => {
   // Websocket functions
   const { emitGameUpdate, emitGameEnd } = useSocketStore();
 
+  // Mix of Store for game and websocket
   useEffect(() => {
-    return () => resetGame();
-  }, [resetGame]);
+      return () => {
+          resetGame();
+          emitGameEnd();
+      };
+  }, [resetGame, emitGameEnd]);
 
   // Let's get the Stats Card
   useEffect(() => {
@@ -83,24 +87,40 @@ const LineTracingPage: React.FC = () => {
     }
   }, [generatePath, pathPoints.length]);
 
-  // Socket Telemetry ---
-  useEffect(() => {
+  // Socket Telemetry (real-time data)
+   useEffect(() => {
     let interval: number;
     if (gameState === 'InProgress') {
       interval = window.setInterval(() => {
+        const state = useLineTracingStore.getState();
+
+        emitGameUpdate({
+            type: 'Line Tracing',
+            score: state.score,
+            timeRemaining,
+            progress,
+            misses: penalties,
+            mode: 'Normal',
+            speed: '-',
+            status: 'InProgress'
+        });
+      }, 200);
+    } else if (gameState === 'Finished' || gameState === 'Failed') {
+        // Emit the final update with the result
         emitGameUpdate({
             type: 'Line Tracing',
             score,
             timeRemaining,
             progress,
-            misses: penalties, // Map penalties to 'misses' for generic display
+            misses: penalties,
             mode: 'Normal',
-            speed: '-'
+            speed: '-',
+            status: gameState // 'Finished' or 'Failed'
         });
-      }, 200);
-    } else if (gameState === 'Finished' || gameState === 'Failed') {
+        // Tell server we are done (which triggers the 10s timeout on server)
         emitGameEnd();
     }
+
     return () => clearInterval(interval);
   }, [gameState, score, timeRemaining, progress, penalties, emitGameUpdate, emitGameEnd]);
 

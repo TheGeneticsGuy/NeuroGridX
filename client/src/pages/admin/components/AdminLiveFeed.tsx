@@ -6,7 +6,7 @@ import './AdminLiveFeed.css';
 interface LiveSession {
   socketId: string;
   user: {
-    _id: string;
+    _id: string; // This is the user ID
     firstName: string;
     lastName: string;
     email: string;
@@ -21,40 +21,44 @@ interface LiveSession {
     progress?: number;
     mode?: string;
     speed?: string;
+    status?: string; // 'InProgress', 'Finished', 'Failed'
   };
   lastUpdate: number;
 }
 
-const AdminLiveFeed: React.FC = () => {
+// Pass property for view switching
+interface AdminLiveFeedProps {
+    onViewUser: (userId: string) => void;
+}
+
+const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
   const { socket } = useSocketStore();
   const [sessions, setSessions] = useState<Map<string, LiveSession>>(new Map());
 
   useEffect(() => {
     if (!socket) return;
 
-    // Join the admin room
     socket.emit('admin_join');
 
-    // Handle initial snapshot
     socket.on('init_active_sessions', (data: LiveSession[]) => {
-      const map = new Map(data.map(s => [s.socketId, s]));
-      setSessions(map);
+        // User ID as the key
+        const map = new Map(data.map(s => [s.user._id, s]));
+        setSessions(map);
     });
 
-    // Handle live updates
     socket.on('live_session_update', (data: LiveSession) => {
       setSessions(prev => {
         const newMap = new Map(prev);
-        newMap.set(data.socketId, data);
+        // Same
+        newMap.set(data.user._id, data);
         return newMap;
       });
     });
 
-    // Handle session end
-    socket.on('session_ended', (socketId: string) => {
+    socket.on('session_ended', (userId: string) => {
       setSessions(prev => {
         const newMap = new Map(prev);
-        newMap.delete(socketId);
+        newMap.delete(userId); // Delete by User ID
         return newMap;
       });
     });
@@ -76,14 +80,15 @@ const AdminLiveFeed: React.FC = () => {
       </div>
 
       {activeList.length === 0 ? (
-        <div className="no-sessions">
-            <p>No users are currently playing.</p>
-            <small>Open a game in another window to test!</small>
-        </div>
+        <div className="no-sessions"><p>No active sessions.</p></div>
       ) : (
         <div className="sessions-grid">
           {activeList.map(session => (
-            <div key={session.socketId} className={`session-card ${session.user.role === 'BCI' ? 'bci-border' : ''}`}>
+            <div
+                key={session.user._id}
+                className={`session-card ${session.user.role === 'BCI' ? 'bci-border' : ''} ${session.game.status === 'Finished' ? 'finished-state' : ''}`}
+                // Analytics button
+            >
               <div className="session-header">
                 <strong>{session.user.firstName} {session.user.lastName}</strong>
                 <span className={`role-badge ${session.user.role}`}>{session.user.role}</span>
@@ -91,7 +96,10 @@ const AdminLiveFeed: React.FC = () => {
 
               <div className="session-game-info">
                 <div className="game-title">{session.game.type}</div>
-                <div className="game-mode">{session.game.mode || 'Normal'} {session.game.speed ? `(${session.game.speed})` : ''}</div>
+                <div className="game-mode">
+                    {session.game.mode} {session.game.speed && `(${session.game.speed})`}
+                    {session.game.status === 'Finished' && <span className="status-finished"> (Finished)</span>}
+                </div>
               </div>
 
               <div className="telemetry-grid">
@@ -113,11 +121,18 @@ const AdminLiveFeed: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        <div className="telemetry-item"><label>Progress</label>{Math.round(session.game.progress || 0)}%</div>
-                        <div className="telemetry-item"><label>Mistakes</label>{session.game.misses || 0}</div>
+                        <div className="telemetry-item"><label>Distance</label>{Math.round(session.game.progress || 0)}%</div>
+                        <div className="telemetry-item"><label>Penalties</label>{session.game.misses || 0}</div>
                     </>
                 )}
               </div>
+
+              <button
+                className="view-stats-btn"
+                onClick={() => onViewUser(session.user._id)}
+              >
+                View History ↗
+              </button>
             </div>
           ))}
         </div>

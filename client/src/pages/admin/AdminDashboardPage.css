@@ -310,3 +310,29 @@
     background-color: var(--color-background-mute);
     color: var(--color-text-primary);
 }
+
+.live-badge-btn {
+    background-color: #ff4d4d;
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+    animation: pulse-red 2s infinite;
+}
+
+.live-indicator-small {
+    color: #ff4d4d;
+    font-weight: bold;
+    font-size: 0.7rem;
+    margin-left: 8px;
+    cursor: pointer;
+    border: 1px solid #ff4d4d;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+.live-indicator-small:hover {
+    background-color: #ff4d4d;
+    color: white;
+}

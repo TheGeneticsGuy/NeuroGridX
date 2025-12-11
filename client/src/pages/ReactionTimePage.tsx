@@ -116,13 +116,14 @@ const ReactionTimePage: React.FC = () => {
 
     if (gameState === 'InProgress') {
       interval = window.setInterval(() => {
+        const state = useGameStore.getState();
         // Send snapshot of current state
         emitGameUpdate({
             type: 'Reaction Time',
-            score: useGameStore.getState().score,
-            timeRemaining: useGameStore.getState().timeRemaining,
-            hits: useGameStore.getState().hits,
-            misses: useGameStore.getState().misses,
+            score: state.score,
+            timeRemaining: state.timeRemaining,
+            hits: state.hits,
+            misses: state.misses,
             mode: gameSettings.isAdvanced ? 'Advanced' : 'Normal',
             speed: gameSettings.isAdvanced ? gameSettings.speed : '-'
         });
@@ -299,7 +300,6 @@ const ReactionTimePage: React.FC = () => {
             </div>
           )}
 
-          {/* --- No changes to Finished Overlay or Target Rendering --- */}
           {gameState === 'Finished' && (
             <div className="game-overlay">
               <h1>Time's Up!</h1>
