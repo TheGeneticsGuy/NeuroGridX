@@ -29,7 +29,7 @@ const seedData = async () => {
     const createdUsers: (typeof User.prototype)[] = [];
 
     // Create Users
-    console.log('👤 Creating Users...');
+    console.log('Creating Users...');
     for (const userData of usersToCreate) {
       // Check if exists first to avoid duplicates
       let user = await User.findOne({ email: userData.email });
@@ -46,7 +46,7 @@ const seedData = async () => {
     }
 
     // Create Attempts
-    console.log('🎮 Creating Challenge Attempts...');
+    console.log('Creating Challenge Attempts...');
     const attempts = [];
 
     for (const user of createdUsers) {
@@ -64,11 +64,11 @@ const seedData = async () => {
     }
 
     await Attempt.insertMany(attempts);
-    console.log(`✅ Successfully inserted ${attempts.length} attempts for ${createdUsers.length} users.`);
+    console.log(`Successfully inserted ${attempts.length} attempts for ${createdUsers.length} users.`);
 
     process.exit();
   } catch (error) {
-    console.error('❌ Error seeding data:', error);
+    console.error('Error seeding data:', error);
     process.exit(1);
   }
 };
