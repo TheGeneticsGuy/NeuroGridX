@@ -90,10 +90,9 @@ const LineTracingPage: React.FC = () => {
   // Socket Telemetry (real-time data)
    useEffect(() => {
     let interval: number;
-    if (gameState === 'InProgress') {
-      interval = window.setInterval(() => {
-        const state = useLineTracingStore.getState();
 
+    const sendUpdate = () => {
+        const state = useLineTracingStore.getState();
         emitGameUpdate({
             type: 'Line Tracing',
             score: state.score || 0,
@@ -104,7 +103,12 @@ const LineTracingPage: React.FC = () => {
             speed: '-',
             status: 'InProgress'
         });
-      }, 200);
+    };
+
+    if (gameState === 'InProgress') {
+        sendUpdate(); // Send immediately on start
+        interval = window.setInterval(sendUpdate, 200);
+
     } else if (gameState === 'Finished' || gameState === 'Failed') {
         // Emit the final update with the result
         emitGameUpdate({

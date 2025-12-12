@@ -10,59 +10,28 @@ type AdminTab = 'live' | 'analytics';
 
 const AdminDashboardPage: React.FC = () => {
   const { user } = useAuthStore();
-  const { socket } = useSocketStore();
+  const activeSessions = useSocketStore((state) => state.activeSessions);
+  const { enterAdminMode, leaveAdminMode } = useSocketStore();
+  const activeUserIds = new Set(activeSessions.keys());
   const [activeTab, setActiveTab] = useState<AdminTab>('analytics');
-  const [activeUserIds, setActiveUserIds] = useState<Set<string>>(new Set());
-   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
-  // Importand and listening to socket so I can get Live feed status for the button count and user
   useEffect(() => {
-    if (!socket) return;
-
-    const updateActiveList = (data: any[]) => {
-        setActiveUserIds(new Set(data.map((s: any) => s.user._id)));
-    };
-
-    socket.on('init_active_sessions', updateActiveList);
-
-    // For the live badge next to names I think ids is sufficient
-    socket.on('live_session_update', (data: any) => {
-        setActiveUserIds(prev => {
-            const next = new Set(prev);
-            next.add(data.user._id);
-            return next;
-        });
-    });
-
-    socket.on('session_ended', (userId: string) => {
-        setActiveUserIds(prev => {
-            const next = new Set(prev);
-            next.delete(userId);
-            return next;
-        });
-    });
-
-    // Initial request if not already joined
-    socket.emit('admin_join');
-
+    enterAdminMode();
     return () => {
-        socket.off('init_active_sessions');
-        socket.off('live_session_update');
-        socket.off('session_ended');
+        leaveAdminMode();
     };
-  }, [socket]);
+  }, [enterAdminMode, leaveAdminMode]);
 
-  const handleViewUser = (userId: string) => {
-      setSelectedUserId(userId);
-      setActiveTab('analytics'); // Switch to the analytics tab
-  };
+  // const handleViewUser = (userId: string) => {
+  //     setSelectedUserId(userId);
+  //     setActiveTab('analytics');
+  // };
 
-  // Handler for clearing selection
   const clearSelection = () => {
       setSelectedUserId(null);
   }
 
-  // Double check admin role on frontend
   if (!user || user.role !== 'Admin') {
     return <Navigate to="/dashboard" replace />;
   }
@@ -83,14 +52,13 @@ const AdminDashboardPage: React.FC = () => {
           onClick={() => setActiveTab('live')}
         >
           Live Mirror Feed
-          {/* Live Feed Button*/}
-          {activeUserIds.size > 0 && <span className="live-badge-btn">{activeUserIds.size}</span>}
+          {activeSessions.size > 0 && <span className="live-badge-btn">{activeSessions.size}</span>}
         </button>
       </div>
 
       <div className="admin-content-area">
         {activeTab === 'live' ? (
-            <AdminLiveFeed onViewUser={handleViewUser} />
+            <AdminLiveFeed />
         ) : (
             <AdminAnalytics
                 activeUserIds={activeUserIds}

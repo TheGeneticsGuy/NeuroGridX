@@ -123,7 +123,7 @@ io.on('connection', (socket) => {
                       activeSessions.delete(userId);
                       io.to('admin-room').emit('session_ended', userId);
                   }
-              }, 8000);
+              }, 10000);
           }
       }
   });
@@ -149,7 +149,7 @@ io.on('connection', (socket) => {
     activeSessions.forEach((session, userId) => {
         // If status is 'InProgress' (or undefined) and no update for 5 seconds...
         // This is just a live feed update in case a user tabs away.
-        if (session.game.status !== 'Finished' && (now - session.lastUpdate > 3000)) {
+        if (session.game.status !== 'Finished' && (now - session.lastUpdate > 5000)) {
             activeSessions.delete(userId);
             io.to('admin-room').emit('session_ended', userId);
         }

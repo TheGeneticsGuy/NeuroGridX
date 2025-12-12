@@ -1,75 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useSocketStore } from '../../../store/socket.store';
 import '../AdminDashboardPage.css';
 import './AdminLiveFeed.css';
 
-interface LiveSession {
-  socketId: string;
-  user: {
-    _id: string; // This is the user ID
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
-  game: {
-    type: string;
-    score: number;
-    timeRemaining: number;
-    hits?: number;
-    misses?: number;
-    progress?: number;
-    mode?: string;
-    speed?: string;
-    status?: string; // 'InProgress', 'Finished', 'Failed'
-  };
-  lastUpdate: number;
-}
-
-// Pass property for view switching
-interface AdminLiveFeedProps {
-    onViewUser: (userId: string) => void;
-}
-
-const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
-  const { socket } = useSocketStore();
-  const [sessions, setSessions] = useState<Map<string, LiveSession>>(new Map());
-
-  useEffect(() => {
-    if (!socket) return;
-
-    socket.emit('admin_join');
-
-    socket.on('init_active_sessions', (data: LiveSession[]) => {
-        // User ID as the key
-        const map = new Map(data.map(s => [s.user._id, s]));
-        setSessions(map);
-    });
-
-    socket.on('live_session_update', (data: LiveSession) => {
-      setSessions(prev => {
-        const newMap = new Map(prev);
-        // Same
-        newMap.set(data.user._id, data);
-        return newMap;
-      });
-    });
-
-    socket.on('session_ended', (userId: string) => {
-      setSessions(prev => {
-        const newMap = new Map(prev);
-        newMap.delete(userId); // Delete by User ID
-        return newMap;
-      });
-    });
-
-    return () => {
-      socket.off('init_active_sessions');
-      socket.off('live_session_update');
-      socket.off('session_ended');
-    };
-  }, [socket]);
-
+const AdminLiveFeed: React.FC = () => {
+  const sessions = useSocketStore((state) => state.activeSessions);
   const activeList = Array.from(sessions.values());
 
   return (
@@ -87,7 +22,6 @@ const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
             <div
                 key={session.user._id}
                 className={`session-card ${session.user.role === 'BCI' ? 'bci-border' : ''} ${session.game.status === 'Finished' ? 'finished-state' : ''}`}
-                // Analytics button
             >
               <div className="session-header">
                 <strong>{session.user.firstName} {session.user.lastName}</strong>
@@ -126,7 +60,6 @@ const AdminLiveFeed: React.FC<AdminLiveFeedProps> = ({ onViewUser }) => {
                         </div>
                     </>
                 ) : (
-                    // Line Tracing Challenge
                     <>
                         <div className="telemetry-item">
                             <label>Distance</label>

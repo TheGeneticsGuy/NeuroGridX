@@ -161,3 +161,21 @@
 
 .text-danger { color: var(--color-danger); }
 .text-score { color: #2ecc71; }
+/*
+.view-stats-btn {
+    margin-top: auto;
+    padding: 0.75rem;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.view-stats-btn:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+} */
