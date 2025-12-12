@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import ChallengesPage from './pages/ChallengesPage';
+import ScrollToTop from './components/common/ScrollToTop';
 import AuthHandler from './components/auth/AuthHandler';
 import Layout from './components/layout/Layout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -14,6 +15,7 @@ import SecurityPage from './pages/SecurityPage';
 import LineTracingPage from './pages/LineTracingPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AboutPage from './pages/AboutPage';
+import NotFoundPage from './pages/NotFoundPage';
 import { useAuthStore } from './store/auth.store';
 
 // Websocket Needs
@@ -43,6 +45,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <AuthHandler />
       <Layout>
         <Routes>
@@ -69,6 +72,8 @@ function App() {
           <Route path="/admin" element={<ProtectedRoute />}>
             <Route index element={<AdminDashboardPage />} />
           </Route>
+
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>
     </Router>

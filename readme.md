@@ -1,10 +1,12 @@
+![NeuroGridX Logo](./client/src/assets/Neurogrid_logo.png)
+
 # NeuroGridX: BCI User Performance & Analysis Platform
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Render-46E3B7?style=for-the-badge&logo=render)](https://neurogrid-client.onrender.com)
+[![Live Demo](./client/src/assets/LiveDemo.jpg)](https://neurogrid-client.onrender.com)
 
 **NeuroGridX** is a full-stack web platform designed to test, analyze, and calibrate Human-Computer Interaction (HCI) performance, with a specific focus on Brain-Computer Interfaces (BCI).
 
-This project was born from a passion for the transformative potential of BCI technology (like Neuralink), and I was directly inspired by Neuralink's [Summer 2025 Update](https://www.youtube.com/watch?v=FASMejN_5gs). It was incredibly inspiring. This project serves as a way to give BCI users more challenges and tasks to do that ultimately provide a fun challenge, as well as utility in testing and tracking their BCI performance over time. Admins might also find the performance tracking over time to be useful. NeuroGridX provides several interactive challenges to measure motor control, reaction speeds, and pathing accuracy, complete with real-time telemetry for researchers and administrators who may wish to actively monitor BCI user performance live.
+This project was born from a passion for the transformative potential of BCI technology (like Neuralink), and I was directly inspired by Neuralink's [Summer 2025 Update](https://www.youtube.com/watch?v=FASMejN_5gs) and their [Webgrid](https://neuralink.com/webgrid/) challenge. It was incredibly inspiring. This project serves as a way to give BCI users more challenges and tasks to do that ultimately provide a fun challenge, as well as utility in testing and tracking their BCI performance over time. Admins might also find the performance tracking over time to be useful. NeuroGridX provides several interactive challenges to measure motor control, reaction speeds, and pathing accuracy, complete with real-time telemetry for researchers and administrators who may wish to actively monitor BCI user performance live.
 
 ---
 
@@ -12,15 +14,19 @@ This project was born from a passion for the transformative potential of BCI tec
 
 ### The Challenge Suite
 *Test fine motor control and reaction speeds with physics-based challenges.*
-![Reaction Time Challenge](./assets/reaction-challenge.png)
+
+![Reaction Time Challenge](./client/src/assets/Neurogrid_ReactionTime.gif)
+
+![Line Tracing Challenge](./client/src/assets/Neurogrid_LineTracing.jpg)
 
 ### Real-Time Admin Telemetry
-*Admins can monitor active user sessions via WebSockets with <200ms latency.*
-![Admin Live Feed](./assets/admin-feed.png)
+*Admins can monitor active user sessions via WebSockets*
+
+![Admin Live Feed](./client/src/assets/admin_dash.jpg)
 
 ### Analytics Dashboard
 *Comprehensive data visualization for tracking performance trends over time.*
-![User Dashboard](./assets/dashboard-analytics.png)
+![User Dashboard](./client/src/assets/Analytics.jpg)
 
 ---
 
@@ -53,7 +59,7 @@ This project uses a modern, type-safe stack organized in a monorepo structure.
 *   **State Management:** Zustand (with persistence middleware)
 *   **Networking:** Axios + Socket.IO Client
 *   **Visualization:** Chart.js + React-Chartjs-2
-*   **Auth:** Google OAuth 2.0 (Identity Services) + JWT
+*   **Auth:** Google OAuth 2.0 (Identity Services) + JWT - (More login options will be added)
 *   **Styling:** Custom CSS Variables (Theming support for Dark/Light mode)
 
 ### **Backend (`/server`)**

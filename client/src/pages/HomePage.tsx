@@ -15,7 +15,7 @@ const HomePage: React.FC = () => {
             {isAuthenticated ? `Welcome back, ${user?.firstName || 'User'}` : 'Telepathy is now Reality'}
           </h1>
           <p className="hero-subtitle">
-            Experience the future of human-computer interaction. Test your cognitive reflexes and motor precision with our advanced BCI calibration suite.
+            Experience the future of human-computer interaction. Test your cognitive reflexes and precision with advanced BCI testing challenges.
           </p>
           {!isAuthenticated && (
             <div className="hero-buttons">
