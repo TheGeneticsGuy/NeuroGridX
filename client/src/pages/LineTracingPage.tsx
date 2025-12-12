@@ -433,7 +433,7 @@ const LineTracingPage: React.FC = () => {
                                 const currentPath = pathPoints;
                                 resetGame();
                                 generatePath(CANVAS_WIDTH, CANVAS_HEIGHT, currentPath);
-                                setIsPreviewing(false); // Go to start screen
+                                setIsPreviewing(true); // Go to start screen
                             }} className="cta-button">
                                 Retry Path
                             </button>

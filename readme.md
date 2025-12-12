@@ -1,32 +1,92 @@
-# NeuroGrid: A Web-Based Platform for Human Computer Interaction Analysis
+![NeuroGridX Logo](./client/src/assets/Neurogrid_logo.png)
 
-[Backend Deployment](https://neurogrid-server.onrender.com/api)
+# NeuroGridX: BCI User Performance & Analysis Platform
 
-[Frontend Deployment](https://neurogrid-client.onrender.com)
+[![Live Demo](./client/src/assets/LiveDemo.jpg)](https://neurogrid-client.onrender.com)
 
-This repository contains the full-stack source code for the NeuroGrid project, a web-based platform for advanced human-computer interaction analysis, with a focus on Brain-Computer Interfaces (BCIs). It is structured as a monorepo with two primary packages:
+**NeuroGridX** is a full-stack web platform designed to test, analyze, and calibrate Human-Computer Interaction (HCI) performance, with a specific focus on Brain-Computer Interfaces (BCI).
 
--   `/server`: The backend API built with Node.js, Express, and TypeScript.
--   `/client`: The frontend application built with React and TypeScript.
+This project was born from a passion for the transformative potential of BCI technology (like Neuralink), and I was directly inspired by Neuralink's [Summer 2025 Update](https://www.youtube.com/watch?v=FASMejN_5gs) and their [Webgrid](https://neuralink.com/webgrid/) challenge. It was incredibly inspiring. This project serves as a way to give BCI users more challenges and tasks to do that ultimately provide a fun challenge, as well as utility in testing and tracking their BCI performance over time. Admins might also find the performance tracking over time to be useful. NeuroGridX provides several interactive challenges to measure motor control, reaction speeds, and pathing accuracy, complete with real-time telemetry for researchers and administrators who may wish to actively monitor BCI user performance live.
 
 ---
 
-## Backend (`/server`)
+## Application Preview
 
-The backend provides a RESTful API for user authentication, challenge management, and data storage, along with a WebSocket server for real-time communication.
+### The Challenge Suite
+*Test fine motor control and reaction speeds with physics-based challenges.*
 
-### Core Technologies
+![Reaction Time Challenge](./client/src/assets/Neurogrid_ReactionTime.gif)
 
--   **Runtime:** [Node.js](https://nodejs.org/)
--   **Framework:** [Express.js](https://expressjs.com/)
--   **Database:** [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
--   **Authentication:** JWT with Passport.js
+![Line Tracing Challenge](./client/src/assets/Neurogrid_LineTracing.jpg)
 
-## Frontend (`/client`)
+### Real-Time Admin Telemetry
+*Admins can monitor active user sessions via WebSockets*
 
-The frontend is a modern, single-page application (SPA) built with React that provides the user interface for all interactive challenges, including user and admin dashboards.
+![Admin Live Feed](./client/src/assets/admin_dash.jpg)
+
+### Analytics Dashboard
+*Comprehensive data visualization for tracking performance trends over time.*
+![User Dashboard](./client/src/assets/Analytics.jpg)
+
+---
+
+## Key Features
+
+### Interactive Challenge Engine
+*   **Reaction Time:** A reflex test using expanding targets with precise distance-from-center scoring. Features an "Advanced Mode" with physics-based moving targets.
+*   **Line Tracing:** A "steady-hand(mind)" test requiring users to navigate complex generated paths. How far along the path can you stay within the border.
+*   **Custom Physics Engine:** Basic, but built from scratch using `requestAnimationFrame` for smooth, high FPS target movement and collision detection of the moving orb targets.
+
+### Real-Time Telemetry System
+*   **Live Mirror Feed:** Utilizes **Socket.IO** to stream gameplay state from clients to the Admin Dashboard in real-time.
+*   **Active Session Tracking:** Admins can see exactly who is online, what they are playing, and their current live score/status, as well as review user performance history.
+*   **Heartbeat Monitoring:** Automatic cleanup of inactive sessions to ensure data accuracy. For example, navigating away from the challenge or closing the page will immediately negate the attempt.
+
+### Data Analytics & Management
+*   **Deep Statistical Analysis:** Tracks metrics like "Net Targets Per Minute" (NTPM), average accuracy variance, and completion velocity. *Work in Progress as more will be added*
+*   **Visualizations:** Uses **Chart.js** to render interactive performance graphs (Daily Peaks, Activity Trends).
+*   **Role-Based Access Control (RBAC):** Distinct flows for Standard Users, BCI Applicants (Pending/Verified), and Administrators.
+
+---
+
+## Tech Stack
+
+This project uses a modern, type-safe stack organized in a monorepo structure.
+
+### **Frontend (`/client`)**
+*   **Framework:** React 18 + Vite
+*   **Language:** TypeScript
+*   **State Management:** Zustand (with persistence middleware)
+*   **Networking:** Axios + Socket.IO Client
+*   **Visualization:** Chart.js + React-Chartjs-2
+*   **Auth:** Google OAuth 2.0 (Identity Services) + JWT - (More login options will be added)
+*   **Styling:** Custom CSS Variables (Theming support for Dark/Light mode)
+
+### **Backend (`/server`)**
+*   **Runtime:** Node.js
+*   **Framework:** Express.js
+*   **Database:** MongoDB + Mongoose ODM
+*   **Real-Time:** Socket.IO Server
+*   **Validation:** Express-Validator
+*   **Security:** Bcrypt (hashing), JWT (stateless auth), CORS configuration
 
 
-## MISC LIBRARIES USED
+## ⚖️ License & Usage
 
--   [**React Oauth2 | Google**](https://www.npmjs.com/package/@react-oauth/google) - User Auth with Google with customizable frames.
+**© 2025 Aaron Topping. All Rights Reserved.**
+
+The source code in this repository is provided for **educational and portfolio demonstration purposes only**.
+
+You are permitted to:
+*   View the code.
+*   Clone the repository to your local machine to test the application.
+
+You are **NOT** permitted to:
+*   Use this code for commercial purposes.
+*   Distribute, modify, or sublicense the code.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by Aaron Topping</sub>
+</div>

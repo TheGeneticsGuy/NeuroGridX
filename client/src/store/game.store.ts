@@ -270,7 +270,7 @@ export const useGameStore = create<GameStateStore>((set, get) => ({
     if (get()._animationFrameId) cancelAnimationFrame(get()._animationFrameId!);
     set({
       gameState: GameState.Finished,
-      _timerInterval: null,
+      _timerInterval: 0, // forcing to zero because on the live admin dash it will show 1 as last
       _animationFrameId: null,
       targets: []
     });

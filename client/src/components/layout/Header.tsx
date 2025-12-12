@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth.store';
 import ThemeToggle from '../common/ThemeToggle';
+import logo from '../../assets/Neurogrid_logo.png';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -17,8 +18,8 @@ const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="header-container">
-        <Link to="/" className="logo">
-          NeuroGridX
+        <Link to="/" className="logo-link">
+          <img src={logo} alt="NeuroGridX" className="app-logo" />
         </Link>
         <div>
           <ThemeToggle /> MODE

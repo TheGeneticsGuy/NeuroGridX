@@ -33,6 +33,8 @@
   --color-status-error-text: #e74c3c;
 
   --color-bonus-points-text: #ffd700;
+
+  --logo-brightness: 2.1;
 }
 
 /*Override default when the <html> element has the data-theme="light" attribute*/
@@ -66,6 +68,8 @@
   --color-status-error-text: #c0392b;
 
   --color-bonus-points-text: #11ce8f;
+
+  --logo-brightness: 1.0;
 }
 
 body {
