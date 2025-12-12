@@ -94,7 +94,6 @@ const ReactionTimePage: React.FC = () => {
             headers: { Authorization: `Bearer ${token}` },
           });
 
-          console.log("Score saved successfully!");
         } catch (error: any) {
           console.error("Failed to save score:", error);
         if (error.response) {
