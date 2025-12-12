@@ -5,7 +5,6 @@ import passport from 'passport';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import connectDB from './config/db';
-import { setupSwagger } from './config/swagger';
 import configurePassport from './config/passport';
 
 // Route Imports
@@ -60,9 +59,6 @@ app.use(cors(corsOptions));
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
-
-// Swagger
-setupSwagger(app);
 
 // Routes
 app.use('/api/users', userRoutes);

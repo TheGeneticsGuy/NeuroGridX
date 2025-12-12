@@ -21,7 +21,6 @@ The backend provides a RESTful API for user authentication, challenge management
 -   **Framework:** [Express.js](https://expressjs.com/)
 -   **Database:** [MongoDB](https://www.mongodb.com/) with [Mongoose](https://mongoosejs.com/)
 -   **Authentication:** JWT with Passport.js
--   **API Documentation:** Swagger
 
 ## Frontend (`/client`)
 

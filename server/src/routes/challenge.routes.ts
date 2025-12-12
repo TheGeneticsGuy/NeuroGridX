@@ -8,7 +8,6 @@ const router = express.Router();
 router.route('/attempts/my-attempts').get(protect, getMyAttempts);
 
 // A user MUST be logged in to view their results
-// TODO: Add Swagger documentation
 // POST
 router.route('/attempts').post(protect, createAttempt);
 
