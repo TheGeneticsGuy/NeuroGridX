@@ -39,6 +39,7 @@ export const registerUser = async (req: Request, res: Response) => {
       res.status(201).json({
         _id: user._id,
         email: user.email,
+        firstName: user.firstName,
         role: user.role,
         bciStatus: user.bciStatus,  // Immediate status which is nice.
         token: generateToken((user._id as Types.ObjectId).toString(), user.role),

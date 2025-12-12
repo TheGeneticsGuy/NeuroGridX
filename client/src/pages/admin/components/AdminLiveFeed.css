@@ -1,0 +1,181 @@
+.live-feed-container {
+  width: 100%;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  color: #ff4d4d;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Pulsing Red Dot Animation */
+.live-indicator::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d4d;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
+}
+
+.no-sessions {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 4rem;
+  background-color: var(--color-background-mute);
+  border-radius: 8px;
+  border: 1px dashed var(--color-border);
+}
+
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.session-card {
+  background-color: var(--color-background-mute);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.session-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+/* Special border for BCI users */
+.session-card.bci-border {
+  border: 2px solid #ffd700; /* Gold */
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
+}
+
+/* Header: Name + Badge */
+.session-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.session-header strong {
+  font-size: 1.1rem;
+  color: var(--color-text-primary);
+}
+
+.role-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  border: 1px solid currentColor;
+}
+
+.role-badge.Standard {
+    color: var(--color-text-secondary);
+    border-color: var(--color-border);
+}
+.role-badge.BCI {
+    color: #ffd700;
+    background-color: rgba(255, 215, 0, 0.1);
+    border-color: #ffd700;
+}
+.role-badge.Admin {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* Game Info */
+.session-game-info {
+  background-color: var(--color-background-soft);
+  padding: 0.5rem;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.game-title {
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.game-mode {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* Telemetry Grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.telemetry-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-background);
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+}
+
+.telemetry-item label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 2px;
+}
+
+.telemetry-item span, .telemetry-item div {
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums; /* jittery numbers prevention*/
+}
+
+.text-danger { color: var(--color-danger); }
+.text-score { color: #2ecc71; }
+/*
+.view-stats-btn {
+    margin-top: auto;
+    padding: 0.75rem;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.view-stats-btn:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+} */

@@ -3,8 +3,11 @@ import { useAuthStore } from '../store/auth.store';
 import { useLineTracingStore } from '../store/lineTracing.store';
 import axios from 'axios';
 import LineTraceStatCard from '../components/dashboard/stat-cards/LineTraceStatCard';
+import GameRulesSidebar from '../components/game/GameRulesSidebar';
+import { useSocketStore } from '../store/socket.store';
 import { type Attempt } from '../types/challenge.types';
 import './LineTracingPage.css';
+
 
 const MAX_OFF_PATH_DISTANCE = 150;
 const MAX_PROGRESS_JUMP = 5;
@@ -42,12 +45,19 @@ const LineTracingPage: React.FC = () => {
   const CANVAS_WIDTH = 1000;
   const CANVAS_HEIGHT = 600;
 
-  // Floating Text State ---
+  // Floating Text State
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
 
+  // Websocket functions
+  const { emitGameUpdate, emitGameEnd } = useSocketStore();
+
+  // Mix of Store for game and websocket
   useEffect(() => {
-    return () => resetGame();
-  }, [resetGame]);
+      return () => {
+          resetGame();
+          emitGameEnd();
+      };
+  }, [resetGame, emitGameEnd]);
 
   // Let's get the Stats Card
   useEffect(() => {
@@ -76,6 +86,47 @@ const LineTracingPage: React.FC = () => {
         generatePath(CANVAS_WIDTH, CANVAS_HEIGHT);
     }
   }, [generatePath, pathPoints.length]);
+
+  // Socket Telemetry (real-time data)
+   useEffect(() => {
+    let interval: number;
+
+    const sendUpdate = () => {
+        const state = useLineTracingStore.getState();
+        emitGameUpdate({
+            type: 'Line Tracing',
+            score: state.score || 0,
+            timeRemaining: state.timeRemaining,
+            progress: state.progress || 0,
+            misses: state.penalties || 0,
+            mode: 'Normal',
+            speed: '-',
+            status: 'InProgress'
+        });
+    };
+
+    if (gameState === 'InProgress') {
+        sendUpdate(); // Send immediately on start
+        interval = window.setInterval(sendUpdate, 200);
+
+    } else if (gameState === 'Finished' || gameState === 'Failed') {
+        // Emit the final update with the result
+        emitGameUpdate({
+            type: 'Line Tracing',
+            score,
+            timeRemaining,
+            progress,
+            misses: penalties,
+            mode: 'Normal',
+            speed: '-',
+            status: gameState // 'Finished' or 'Failed'
+        });
+        // Tell server we are done (which triggers the 10s timeout on server)
+        emitGameEnd();
+    }
+
+    return () => clearInterval(interval);
+  }, [gameState, score, timeRemaining, progress, penalties, emitGameUpdate, emitGameEnd]);
 
   // CANVAS DRAWING
   useEffect(() => {
@@ -257,7 +308,7 @@ const LineTracingPage: React.FC = () => {
   }, [gameState, isAuthenticated, token, score, timeRemaining, progress, penalties]);
 
   return (
-    <div className="line-tracing-wrapper">
+    <div className="line-tracing-wrapper" style={{flexDirection: 'column', height: 'auto', minHeight: 'calc(100vh - 80px)'}}>
         <div className="tracing-hud-area">
             <div className="tracing-hud">
                 {/* Display Time Remaining */}
@@ -399,6 +450,8 @@ const LineTracingPage: React.FC = () => {
                 )}
             </div>
         </div>
+
+        <GameRulesSidebar mode="Line Tracing" />
 
         {/* Tooltips */}
         {gameState === 'NotStarted' && isOverStartZone && (

@@ -5,6 +5,8 @@ import axios from 'axios';
 import ReactionTimeStatCard from '../components/dashboard/stat-cards/ReactionTimeStatCard';
 import InteractiveTarget from '../components/game/InteractiveTarget';
 import { type Attempt } from '../types/challenge.types';
+import GameRulesSidebar from '../components/game/GameRulesSidebar';
+import { useSocketStore } from '../store/socket.store';
 import './ReactionTimePage.css';
 import { useUIStore } from '../store/ui.store';
 
@@ -40,6 +42,7 @@ const ReactionTimePage: React.FC = () => {
   const [floatingTexts, setFloatingTexts] = useState<FloatingText[]>([]);
   const { gameSettings: uiGameSettings, setGameSettings } = useUIStore();
   const { isAdvanced: isAdvancedMode, speed } = uiGameSettings;
+  const { emitGameUpdate, emitGameEnd } = useSocketStore();
 
   useEffect(() => {
     return () => { resetGame(); };
@@ -106,6 +109,32 @@ const ReactionTimePage: React.FC = () => {
       saveScore();
     }
   }, [gameState, isAuthenticated, token, score, hits, misses, clickAccuracies, gameSettings]);
+
+  // Telemetry Effect (using websocket)
+  useEffect(() => {
+    let interval: number;
+
+    if (gameState === 'InProgress') {
+      interval = window.setInterval(() => {
+        const state = useGameStore.getState();
+        // Send snapshot of current state
+        emitGameUpdate({
+            type: 'Reaction Time',
+            score: state.score,
+            timeRemaining: state.timeRemaining,
+            hits: state.hits,
+            misses: state.misses,
+            mode: gameSettings.isAdvanced ? 'Advanced' : 'Normal',
+            speed: gameSettings.isAdvanced ? gameSettings.speed : '-'
+        });
+      }, 200); // 5 times a second (200ms)
+    } else if (gameState === 'Finished' || gameState === 'NotStarted') {
+        // When game stops, tell server
+        emitGameEnd();
+    }
+
+    return () => clearInterval(interval);
+  }, [gameState, emitGameUpdate, emitGameEnd]);
 
   // Need to filter advanced vs normal mode on the stats
   const filteredAttempts = useMemo(() => {
@@ -271,7 +300,6 @@ const ReactionTimePage: React.FC = () => {
             </div>
           )}
 
-          {/* --- No changes to Finished Overlay or Target Rendering --- */}
           {gameState === 'Finished' && (
             <div className="game-overlay">
               <h1>Time's Up!</h1>
@@ -334,6 +362,8 @@ const ReactionTimePage: React.FC = () => {
 
         </div>
       </div>
+
+      <GameRulesSidebar mode="Reaction Time" />
     </div>
   );
 };

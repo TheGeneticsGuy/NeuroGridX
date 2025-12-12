@@ -14,8 +14,32 @@ import SecurityPage from './pages/SecurityPage';
 import LineTracingPage from './pages/LineTracingPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AboutPage from './pages/AboutPage';
+import { useAuthStore } from './store/auth.store';
+
+// Websocket Needs
+import { useSocketStore } from './store/socket.store';
+import { useEffect } from 'react';
 
 function App() {
+  const { connect, disconnect } = useSocketStore();
+  const { user } = useAuthStore();
+  const { socket } = useSocketStore();
+
+  useEffect(() => {
+    connect();
+    return () => disconnect();
+  }, [connect, disconnect]);
+
+  useEffect(() => {
+    if (socket && user) {
+        socket.emit('identify', {
+            _id: user.id || (user as any)._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role
+        });
+    }
+  }, [socket, user]);
 
   return (
     <Router>
