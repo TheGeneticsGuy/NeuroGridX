@@ -80,3 +80,31 @@
   color: var(--color-text-secondary);
   margin-left: 1rem;
 }
+
+.header-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.app-logo {
+  height: 80px;
+  width: auto;
+  display: block;
+  padding-right: 2rem;
+  filter: brightness(var(--logo-brightness));
+}
+
+/* Light Mode Override (if needed) */
+/* [data-theme='light'] .app-logo {
+  filter: none;
+} */
