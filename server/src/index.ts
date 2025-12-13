@@ -27,7 +27,8 @@ const io = new Server(httpServer, {
   cors: {
     origin: [
       'http://localhost:5173',
-      'https://neurogrid-client.onrender.com'
+      'https://neurogrid-client.onrender.com',
+      'https://neurogridx.aarontopping.com'
     ],
     methods: ["GET", "POST"]
   }
