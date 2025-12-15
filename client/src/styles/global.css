@@ -35,6 +35,8 @@
   --color-bonus-points-text: #ffd700;
 
   --logo-brightness: 2.1;
+
+  --header-height: 120px;
 }
 
 /*Override default when the <html> element has the data-theme="light" attribute*/

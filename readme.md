@@ -13,7 +13,7 @@ This project was born from a passion for the transformative potential of BCI tec
 ## Application Preview
 
 ### The Challenge Suite
-*Test fine motor control and reaction speeds with physics-based challenges.*
+*Test fine mental/motor control and reaction speeds with physics-based challenges.*
 
 ![Reaction Time Challenge](./client/src/assets/Neurogrid_ReactionTime.gif)
 

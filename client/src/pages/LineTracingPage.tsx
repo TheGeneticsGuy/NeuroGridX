@@ -308,7 +308,7 @@ const LineTracingPage: React.FC = () => {
   }, [gameState, isAuthenticated, token, score, timeRemaining, progress, penalties]);
 
   return (
-    <div className="line-tracing-wrapper" style={{flexDirection: 'column', height: 'auto', minHeight: 'calc(100vh - 80px)'}}>
+    <div className="line-tracing-wrapper">
         <div className="tracing-hud-area">
             <div className="tracing-hud">
                 {/* Display Time Remaining */}
