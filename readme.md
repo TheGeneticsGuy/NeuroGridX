@@ -77,6 +77,8 @@ This project uses a modern, type-safe stack organized in a monorepo structure.
 
 The source code in this repository is provided for **educational and portfolio demonstration purposes only**.
 
+*Please note, these rights are reserved because I do not want someone to wrap this up into some commercialized service. I, the author, Aaron Topping, am a very reasonable person and if you are interested in using this for some legitimate reason, just message me and I am very likely to authorize it, excitedly.*
+
 You are permitted to:
 *   View the code.
 *   Clone the repository to your local machine to test the application.
