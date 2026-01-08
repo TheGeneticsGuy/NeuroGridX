@@ -1,23 +1,16 @@
-# 1. Use an official Node runtime as a parent image
-FROM node:20-alpine
+# server/Dockerfile
 
-# 2. Set the working directory inside the container
+FROM node:20-alpine
 WORKDIR /app
 
-# 3. Copy package.json and package-lock.json
-COPY package*.json ./
+# Change: Copy from the 'server' directory
+COPY server/package*.json ./
 
-# 4. Install dependencies
 RUN npm install
 
-# 5. Copy the rest of the application code
-COPY . .
+# Change: Copy the 'server' directory contents
+COPY server/ .
 
-# 6. Build the TypeScript code
 RUN npm run build
-
-# 7. Expose the port the app runs on
 EXPOSE 5001
-
-# 8. Define the command to run the app
 CMD ["npm", "run", "start"]
