@@ -21,15 +21,11 @@ configurePassport(); // For Oauth login for Google
 const app: Express = express();
 app.set('trust proxy', 1);  // Necessary for my Oauth
 
-app.use(cors({
-  origin: true, // Allow requests
-  credentials: true
-}));
-
 const httpServer = createServer(app);
 
 const allowedOrigins = [
   'http://localhost:5173',                // Local Development
+  'http://192.168.1.50:3050',             // Dokploy
   'https://www.neurogrid-x.com',          // Production (Primary)
   'https://neurogrid-x.com'               // Production (Non-WWW fallback)
 ];
@@ -58,7 +54,7 @@ const corsOptions: cors.CorsOptions = {
 };
 
 // Applying CORS
-app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Middlewares
 app.use(express.json());
