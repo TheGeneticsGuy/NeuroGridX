@@ -28,19 +28,37 @@ app.use(cors({
 
 const httpServer = createServer(app);
 
+const allowedOrigins = [
+  'http://localhost:5173',                // Local Development
+  'https://www.neurogrid-x.com',          // Production (Primary)
+  'https://neurogrid-x.com'               // Production (Non-WWW fallback)
+];
+
 const io = new Server(httpServer, {
   cors: {
-    origin: [
-      "https://neurogrid-x.com",
-      "https://www.neurogrid-x.com",
-      "http://localhost:5173"
-    ],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   }
 });
 
 const PORT = process.env.PORT || 5001;  // Local will be 5001
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    console.log("Incoming Origin:", origin);
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.error("CORS Error: Origin not allowed:", origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+
+// Applying CORS
+app.use(cors(corsOptions));
 
 // Middlewares
 app.use(express.json());
