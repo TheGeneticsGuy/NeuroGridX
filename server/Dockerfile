@@ -8,8 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # 4. Install dependencies
-# 'npm ci' is faster and more reliable for builds than 'npm install'
-RUN npm ci
+RUN npm install
 
 # 5. Copy the rest of the application code
 COPY . .
