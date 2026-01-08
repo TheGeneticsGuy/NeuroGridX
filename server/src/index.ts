@@ -21,43 +21,28 @@ configurePassport(); // For Oauth login for Google
 const app: Express = express();
 app.set('trust proxy', 1);  // Necessary for my Oauth
 
+app.use(cors({
+  origin: true, // Allow requests
+  credentials: true
+}));
+
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
     origin: [
-      'http://localhost:5173',
-      'https://neurogrid-client.onrender.com',
-      'https://neurogridx.aarontopping.com'
+      "https://neurogrid-x.com",
+      "https://www.neurogrid-x.com",
+      "http://localhost:5173"
     ],
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 const PORT = process.env.PORT || 5001;  // Local will be 5001
 
-const allowedOrigins = [
-  'http://localhost:5173', // Local frontend
-  'https://neurogrid-client.onrender.com'
-];
-
-const corsOptions: cors.CorsOptions = {
-  origin: (origin, callback) => {
-    console.log("Incoming Origin:", origin);
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.error("CORS Error: Origin not allowed:", origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-
 // Middlewares
-app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 

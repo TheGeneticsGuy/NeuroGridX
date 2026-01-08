@@ -12,3 +12,16 @@
 .app-footer p {
   margin: 0.3rem;
 }
+
+.app-footer a {
+  text-decoration: none;
+  color: black;
+}
+
+.app-footer a:visited {
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
