@@ -51,7 +51,11 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   connect: () => {
     if (get().socket) return;
 
-    const socket = io(SOCKET_URL);
+    const socket = io(SOCKET_URL, {
+      path: '/socket.io/',
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+    });
 
     socket.on('connect', () => {
       console.log('Connected to WebSocket');
