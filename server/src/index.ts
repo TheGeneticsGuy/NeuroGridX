@@ -25,7 +25,7 @@ const httpServer = createServer(app);
 
 const allowedOrigins = [
   'http://localhost:5173',                // Local Development
-  'http://192.168.1.50:3050',             // Dokploy route
+  'http://localhost:3050',                // Dokploy route
   'https://www.neurogrid-x.com',          // Production (Primary)
   'https://neurogrid-x.com'               // Production (Non-WWW fallback)
 ];
