@@ -16,6 +16,7 @@ import LineTracingPage from './pages/LineTracingPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
+import CookieBanner from './components/common/CookieBanner';
 import { useAuthStore } from './store/auth.store';
 
 // Websocket Needs
@@ -47,6 +48,8 @@ function App() {
     <Router>
       <ScrollToTop />
       <AuthHandler />
+      <CookieBanner />
+
       <Layout>
         <Routes>
           {/* Public Routes */}
@@ -76,6 +79,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Layout>
+
     </Router>
   );
 }

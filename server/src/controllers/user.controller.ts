@@ -3,6 +3,9 @@ import { Types } from 'mongoose'; // Had to import this to resolve TS's issue wi
 import User from '../models/user.model';
 import generateToken from '../utils/generateToken';
 import { AuthRequest } from '../middleware/auth.middleware';
+import Attempt from '../models/attempt.model';
+import archiver from 'archiver';
+
 
 // @route   POST /api/users/register
 // @access  Public
@@ -173,37 +176,113 @@ export const updateUserProfile = async (req: AuthRequest, res: Response) => {
 };
 
 // @route   PUT /api/users/password
-  // @access  Private
-  export const updateUserPassword = async (req: AuthRequest, res: Response) => {
-    const user = await User.findById(req.user._id);
+// @access  Private
+export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.user._id);
 
-    if (user) {
-      // Verify old p/w
-      const { currentPassword, newPassword } = req.body;
-      if (await user.matchPassword(currentPassword)) {
-        // Set new pw
-        user.password = newPassword;
-        await user.save();
-        res.json({ message: 'Password updated successfully' });
-      } else {
-        res.status(401).json({ message: 'Invalid current password' });
-      }
+  if (user) {
+    // Verify old p/w
+    const { currentPassword, newPassword } = req.body;
+    if (await user.matchPassword(currentPassword)) {
+      // Set new pw
+      user.password = newPassword;
+      await user.save();
+      res.json({ message: 'Password updated successfully' });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(401).json({ message: 'Invalid current password' });
     }
-  };
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+};
 
-  // @route   DELETE /api/users
-  // @access  Private
-  export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
-    const user = await User.findById(req.user._id);
+// @route   DELETE /api/users
+// @access  Private
+export const deleteUserAccount = async (req: AuthRequest, res: Response) => {
+  const user = await User.findById(req.user._id);
 
-    if (user) {
-      //  For now, just doing a hard delete of the user, but eventually I should add something that deletes user from all collections
+  if (user) {
+    //  For now, just doing a hard delete of the user, but eventually I should add something that deletes user from all collections
 
-      await user.deleteOne();
-      res.json({ message: 'User removed' });
-    } else {
-      res.status(404).json({ message: 'User not found' });
-    }
-  };
+    await user.deleteOne();
+    res.json({ message: 'User removed' });
+  } else {
+    res.status(404).json({ message: 'User not found' });
+  }
+};
+
+// @route   GET /api/users/export
+// @access  Private
+export const exportUserData = async (req: AuthRequest, res: Response) => {
+  //2026-01-08_neurogridX_user_data.zip
+  // ├── README.json
+  // └── user/
+  // ├── profile.json
+  // └── history.json
+
+  if (!req.user) {
+    return res.status(401).json({ message: 'Not authorized' });
+  }
+
+  try {
+    // Get data
+    const userProfile = await User.findById(req.user._id).select('-password');
+    const history = await Attempt.find({ userId: req.user._id });
+
+    // ZIP headers
+    const dateString = new Date().toISOString().split('T')[0];
+    const zipFilename = `${dateString}_neurogridX_user_data.zip`;
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${zipFilename}"`
+    );
+
+    // Create ZIP stream
+    const archive = archiver('zip', {
+      zlib: { level: 9 }, // Max compression amount
+    });
+
+    // Handle archive errors
+    archive.on('error', (err: any) => {
+      console.error('Archive error:', err);
+      res.status(500).end();
+    });
+
+    // Pipe ZIP → response
+    archive.pipe(res);
+
+    // Add files to ZIP
+    archive.append(
+      JSON.stringify(
+        {
+          exportedAt: new Date().toISOString(),
+          note:
+            "This data is exported in compliance with the EU General Data Protection Regulation (GDPR). NeuroGridX does not sell user data.",
+        },
+        null,
+        2
+      ),
+      { name: 'README.json' }
+    );
+
+    archive.append(
+      JSON.stringify(userProfile, null, 2),
+      { name: 'user/profile.json' }
+    );
+
+    archive.append(
+      JSON.stringify(history, null, 2),
+      { name: 'user/history.json' }
+    );
+
+    // Finalize ZIP
+    await archive.finalize();
+
+  } catch (error: any) {
+    console.error('Export failed:', error);
+    res.status(500).json({ message: 'Export failed', error: error.message });
+  }
+};
+
