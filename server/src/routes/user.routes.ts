@@ -1,7 +1,8 @@
 import express from 'express';
-import { registerUser, loginUser, getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount } from '../controllers/user.controller';
+import { registerUser, loginUser, getUserProfile, updateUserProfile, updateUserPassword, deleteUserAccount, exportUserData } from '../controllers/user.controller';
 import { protect } from '../middleware/auth.middleware';
 import { validateRegistration, validateLogin, validateProfileUpdate, validatePasswordChange } from '../middleware/validation.middleware';
+
 
 const router = express.Router();
 
@@ -18,5 +19,8 @@ router.put('/password', protect, validatePasswordChange, updateUserPassword);
 
 // Delete Account Route
 router.delete('/', protect, deleteUserAccount);
+
+// This is for GDPR compliance - need to be able to export the data
+router.get('/export', protect, exportUserData);
 
 export default router;

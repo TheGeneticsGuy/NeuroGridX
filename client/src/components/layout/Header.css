@@ -104,8 +104,3 @@
   padding-right: 2rem;
   filter: brightness(var(--logo-brightness));
 }
-
-/* Light Mode Override (if needed) */
-/* [data-theme='light'] .app-logo {
-  filter: none;
-} */

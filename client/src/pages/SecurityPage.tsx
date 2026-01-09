@@ -56,9 +56,41 @@ const SecurityPage: React.FC = () => {
     }
   };
 
+  // For EU Compliant GDPR data
+  const handleDownloadData = async (): Promise<void> => {
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/api/users/export`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob',
+      }
+    );
+
+      // Makes it yyyy-mm-dd
+      const dateString = new Date().toISOString().split('T')[0];
+      const filename = `${dateString}_neurogridX_myData.zip`;
+
+      const url = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+
+      link.href = url;
+      link.download = filename;
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+    } catch (error) {
+      console.error("Download failed", error);
+      alert("Failed to download user data.");
+    }
+  };
+
   return (
     <div className="security-page-container">
-      <h1>Security & Settings</h1>
+      <h1>Security & Privacy Settings</h1>
 
       {/*CHANGE PASSWORD SECTION*/}
       <div className="security-section">
@@ -100,6 +132,16 @@ const SecurityPage: React.FC = () => {
 
           <button type="submit" className="form-button">Update Password</button>
         </form>
+      </div>
+
+      {/* GDPR COMPLIANCE - DOWNLOAD USER DATA */}
+      <div className="privacy-section">
+        <h2>Data Privacy (GDPR)</h2>
+        <p>You have the right to access your data. Click below to download a copy of all information store about your account.</p>
+        <p>NeuroGridX does not sell user data</p>
+        <button onClick={handleDownloadData} className="cta-button secondary">
+          Download My Data
+        </button>
       </div>
 
       {/*DANGER ZONE*/}
