@@ -15,7 +15,7 @@
 
 .app-footer a {
   text-decoration: none;
-  color: black;
+  color: var(--color-text-primary);
 }
 
 .app-footer a:visited {

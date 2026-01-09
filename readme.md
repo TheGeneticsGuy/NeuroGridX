@@ -2,7 +2,7 @@
 
 # NeuroGridX: BCI User Performance & Analysis Platform
 
-[![Live Demo](./client/src/assets/LiveDemo.jpg)](https://neurogrid-client.onrender.com)
+[![Live Demo](./client/src/assets/LiveDemo.jpg)](https://www.neurogrid-x.com)
 
 **NeuroGridX** is a full-stack web platform designed to test, analyze, and calibrate Human-Computer Interaction (HCI) performance, with a specific focus on Brain-Computer Interfaces (BCI).
 
